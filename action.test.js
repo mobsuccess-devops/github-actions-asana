@@ -50,13 +50,15 @@ describe("Asana GitHub actions", () => {
     test("is approved", async () => {
       await performTest("listReviews-approved", { isApproved: true });
     });
-    test("is pending",async () => {
+    test("is pending", async () => {
       await performTest("listReviews-pending", {});
     });
     test("is rejected and commented", async () => {
-      await performTest("listReviews-rejected-and-commented", { isRejected: true });
+      await performTest("listReviews-rejected-and-commented", {
+        isRejected: true,
+      });
     });
-    test("is rejected",async () => {
+    test("is rejected", async () => {
       await performTest("listReviews-rejected", { isRejected: true });
     });
     test("is approved and rejected", async () => {
