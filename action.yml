@@ -1,0 +1,21 @@
+name: "Asana Github Actions"
+description: "Asana Github Actions"
+inputs:
+  asana-pat:
+    description: "Asana Public Access Token."
+    required: true
+  action:
+    description: "The action to be performed debug|synchronize"
+    required: false
+  trigger-phrase:
+    description: "Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3"
+    required: false
+  github-token:
+    description: "your github auth token"
+    required: false
+branding:
+  icon: "chevron-right"
+  color: "gray-dark"
+runs:
+  using: "node12"
+  main: "index.js"
