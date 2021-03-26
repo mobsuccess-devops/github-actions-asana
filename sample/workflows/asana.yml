@@ -26,6 +26,6 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           github-token: ${{ github.token }}
-          trigger-phrase: "(ticket|asana)"
+          trigger-phrase: "(ticket|asana)(\\s*:)?"
           action: "synchronize"
           comment-id: "#pr:${{env.PR_NUMBER}}"
