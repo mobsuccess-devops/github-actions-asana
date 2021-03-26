@@ -28,4 +28,3 @@ jobs:
           github-token: ${{ github.token }}
           trigger-phrase: "(ticket|asana)(\\s*:)?"
           action: "synchronize"
-          comment-id: "#pr:${{env.PR_NUMBER}}"

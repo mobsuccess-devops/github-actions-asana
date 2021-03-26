@@ -47,26 +47,29 @@ describe("Asana GitHub actions", () => {
       });
     };
 
-    test("is approved", () => {
-      performTest("listReviews-approved", { isApproved: true });
+    test("is approved", async () => {
+      await performTest("listReviews-approved", { isApproved: true });
     });
-    test("is pending", () => {
-      performTest("listReviews-pending", {});
+    test("is pending",async () => {
+      await performTest("listReviews-pending", {});
     });
-    test("is rejected", () => {
-      performTest("listReviews-rejected", { isRejected: true });
+    test("is rejected and commented", async () => {
+      await performTest("listReviews-rejected-and-commented", { isRejected: true });
     });
-    test("is approved and rejected", () => {
-      performTest("listReviews-approved-and-rejected", {
+    test("is rejected",async () => {
+      await performTest("listReviews-rejected", { isRejected: true });
+    });
+    test("is approved and rejected", async () => {
+      await performTest("listReviews-approved-and-rejected", {
         isApproved: true,
         isRejected: true,
       });
     });
-    test("is approved after rejection", () => {
-      performTest("listReviews-approved-after-rejection.js", {
+    test("is approved after rejection", async () => {
+      await performTest("listReviews-approved-after-rejection.js", {
         isApproved: true,
       });
-      performTest(
+      await performTest(
         "listReviews-approved-after-rejection-order-by-date-desc.js",
         { isApproved: true }
       );

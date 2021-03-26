@@ -20,10 +20,14 @@ exports.getPullReviewStatuses = async function getPullReviewStatuses({
   });
   console.log("Sorted Reviews", JSON.stringify(reviews, undefined, 4));
 
-  const stateByUserId = reviews.reduce(
-    (s, { user: { id: userId }, state }) => ({ [userId]: state, ...s }),
-    {}
-  );
+  const stateByUserId = reviews
+    .filter(
+      ({ state }) => ["APPROVED", "CHANGES_REQUESTED"].indexOf(state) >= 0
+    )
+    .reduce(
+      (s, { user: { id: userId }, state }) => ({ [userId]: state, ...s }),
+      {}
+    );
   console.log("State by user ID", stateByUserId);
 
   return Object.entries(stateByUserId).reduce(
