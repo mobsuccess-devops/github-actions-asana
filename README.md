@@ -9,5 +9,6 @@ use this action outside of Mobsuccess, you must clone it and tweak the values.
 
 # Install the workflow in repository
 
-To install the workflow, copy the `sample/workflows/asana.yml` file in
-`.github/workflows/asana.yml`.
+To install the workflow, copy the
+[`sample/workflows/asana.yml`](https://raw.githubusercontent.com/mobsuccess-devops/github-actions-asana/master/sample/workflows/asana.yml)
+file in `.github/workflows/asana.yml`.
