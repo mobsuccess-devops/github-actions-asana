@@ -21,6 +21,7 @@ on:
 jobs:
   Asana:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
       - uses: mobsuccess-devops/github-actions-asana@master
         with:
