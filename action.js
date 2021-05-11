@@ -64,8 +64,9 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   const { isApproved, isRejected } = await exports.getPullReviewStatuses({
     pullRequest,
   });
-  const numberOfRequestedReviewers = (pullRequest.requested_reviewers || [])
-    .length;
+  const numberOfRequestedReviewers = (
+    pullRequest.requested_reviewers || []
+  ).filter(({ login }) => login !== "ms-testers").length;
   const isMerged = await exports.getPullIsMerged({ pullRequest });
   const isDraft = await exports.getPullIsDraft({ pullRequest });
 
@@ -132,9 +133,9 @@ async function shouldMoveTaskToTest({ taskId, pullRequest }) {
     // user ms-testers has been requested a review
     // just to make sure, what is the current section of this task?
     const task = await getTask(taskId, {
-      opt_fields: ["memberships", "assignee", "completed"],
+      opt_fields: ["memberships", "completed"],
     });
-    const { completed, memberships, assignee } = task;
+    const { completed, memberships } = task;
     if (completed) {
       console.log(`Task ${taskId} is completed, not moving task`);
       return false;
