@@ -118,6 +118,7 @@ exports.action = async function action() {
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
   });
+  console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
 
   console.info(`Calling action ${action}`);
