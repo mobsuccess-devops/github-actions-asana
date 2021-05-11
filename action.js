@@ -1,10 +1,20 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const getOctokit = require("./lib/actions/octokit");
-const { updateAsanaTask } = require("./lib/actions/asana");
+const {
+  updateAsanaTask,
+  getTask,
+  moveTaskToProjectSection,
+} = require("./lib/actions/asana");
 
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
+
+const asanaSprintProjectId = "1200175269622723";
+const asanaSprintSectionIds = {
+  toTest: "1200175269622816",
+  ready: "1200175269622817",
+};
 
 exports.getPullReviewStatuses = async function getPullReviewStatuses({
   pullRequest,
@@ -111,6 +121,53 @@ exports.getActionParameters = function getActionParameters() {
   return { pullRequest, action, triggerPhrase };
 };
 
+async function shouldMoveTaskToTest({ taskId, pullRequest }) {
+  const { draft } = pullRequest;
+  if (draft) {
+    // do not move pulls in draft
+    return;
+  }
+  const { requested_reviewers: requestedReviewers } = pullRequest;
+  if (requestedReviewers.some(({ login }) => login === "ms-testers")) {
+    // user ms-testers has been requested a review
+    // just to make sure, what is the current section of this task?
+    const task = await getTask(taskId, {
+      opt_fields: ["memberships", "assignee", "completed"],
+    });
+    const { completed, memberships, assignee } = task;
+    if (completed) {
+      console.log(`Task ${taskId} is completed, not moving task`);
+      return false;
+    }
+
+    const sprintProjectMembership = memberships.find(
+      ({ project: { gid: projectId } }) => projectId === asanaSprintProjectId
+    );
+    if (!sprintProjectMembership) {
+      console.log(
+        `Task ${taskId} is not included in the current sprint, not moving task`
+      );
+      return false;
+    }
+
+    const {
+      section: { gid: sprintSectionId },
+    } = sprintProjectMembership;
+    if (sprintSectionId === asanaSprintSectionIds.toTest) {
+      console.log(
+        `Task ${taskId} is already in the To Test section of the current sprint, not moving task`
+      );
+      return false;
+    }
+    if (sprintSectionId === asanaSprintSectionIds.ready) {
+      console.log(
+        `Task ${taskId} is in the Ready section of the current sprint, not moving task`
+      );
+      return false;
+    }
+  }
+}
+
 exports.action = async function action() {
   const { pullRequest, action, triggerPhrase } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
@@ -133,13 +190,25 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
-        console.log(`Updating Asana task: ${taskId}`);
-        await updateAsanaTask(taskId, {
+        const updateOptions = {
           custom_fields: {
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
           },
-        });
+        };
+
+        if (shouldMoveTaskToTest({ taskId, pullRequest })) {
+          console.log(`Moving Asana task to “to test” and remove assignments`);
+          await moveTaskToProjectSection({
+            taskId,
+            projectId: asanaSprintProjectId,
+            sectionId: asanaSprintSectionIds.toTest,
+          });
+          updateOptions.assignee = null;
+        }
+
+        console.log(`Updating Asana task: ${taskId}`);
+        await updateAsanaTask(taskId, updateOptions);
       }
       break;
     }
