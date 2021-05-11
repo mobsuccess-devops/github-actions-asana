@@ -123,9 +123,9 @@ exports.getActionParameters = function getActionParameters() {
 };
 
 async function shouldMoveTaskToTest({ taskId, pullRequest }) {
-  const { draft } = pullRequest;
-  if (draft) {
-    // do not move pulls in draft
+  const { draft, merged_at: mergedAt } = pullRequest;
+  if (draft || !!mergedAt) {
+    // do not move pulls in draft or already merged
     return;
   }
   const { requested_reviewers: requestedReviewers } = pullRequest;
