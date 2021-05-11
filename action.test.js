@@ -13,6 +13,19 @@ describe("Asana GitHub actions", () => {
       },
     }));
   });
+
+  test("detect if pull request is draft", async () => {
+    const { getPullIsDraft } = require("./action");
+    expect(
+      await getPullIsDraft({
+        pullRequest: {
+          draft: true,
+        },
+      })
+    ).toBe(true);
+    expect(await getPullIsDraft({ pullRequest: { draft: false } })).toBe(false);
+  });
+
   test("detect if pull request is merged", async () => {
     const { getPullIsMerged } = require("./action");
     expect(
@@ -139,6 +152,13 @@ describe("Asana GitHub actions", () => {
       await performTest(
         { pullRequest: { number: 1234 } },
         {},
+        customFieldPRStatus.values.inProgress
+      );
+    });
+    test("is draft", async () => {
+      await performTest(
+        { pullRequest: { number: 1234, draft: true } },
+        { isApproved: true },
         customFieldPRStatus.values.inProgress
       );
     });

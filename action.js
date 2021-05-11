@@ -45,6 +45,11 @@ exports.getPullIsMerged = async function getPullIsMerged({ pullRequest }) {
   return !!mergedAt;
 };
 
+exports.getPullIsDraft = async function getPullIsDraft({ pullRequest }) {
+  const { draft } = pullRequest;
+  return !!draft;
+};
+
 exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   const { isApproved, isRejected } = await exports.getPullReviewStatuses({
     pullRequest,
@@ -52,16 +57,20 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   const numberOfRequestedReviewers = (pullRequest.requested_reviewers || [])
     .length;
   const isMerged = await exports.getPullIsMerged({ pullRequest });
+  const isDraft = await exports.getPullIsDraft({ pullRequest });
 
   console.log("Asana status", {
     isApproved,
     isRejected,
     isMerged,
     numberOfRequestedReviewers,
+    isDraft,
   });
 
   if (isMerged) {
     return customFieldPRStatus.values.merged;
+  } else if (isDraft) {
+    return customFieldPRStatus.values.inProgress;
   } else if (isRejected) {
     return customFieldPRStatus.values.rejected;
   } else if (numberOfRequestedReviewers) {
