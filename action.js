@@ -231,6 +231,7 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
+        console.log("AWS_AMPLIFY_HOSTNAME", process.env.AWS_AMPLIFY_HOSTNAME);
         const updateOptions = {
           custom_fields: {
             ...(process.env.AWS_AMPLIFY_HOSTNAME
