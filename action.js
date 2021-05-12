@@ -267,7 +267,7 @@ exports.action = async function action() {
           updateOptions.assignee = null;
         }
 
-        console.log(`Updating Asana task: ${taskId}`);
+        console.log(`Updating Asana task: ${taskId}`, updateOptions);
         await updateAsanaTask(taskId, updateOptions);
       }
       break;
