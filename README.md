@@ -9,6 +9,11 @@ use this action outside of Mobsuccess, you must clone it and tweak the values.
 
 # Install the workflow in repository
 
-To install the workflow, copy the
-[`sample/workflows/asana.yml`](https://raw.githubusercontent.com/mobsuccess-devops/github-actions-asana/master/sample/workflows/asana.yml)
-file in `.github/workflows/asana.yml`.
+You do not need to take any steps to include this workflow in your repository.
+The MS robot will automatically create a PR on your repository.
+
+## Enable AWS Amplify custom domain
+
+If your repository is linked to AWS Amplify, you can dynamically update the
+Amplify hostname link. To do so, create a secret in your repository named
+`AWS_AMPLIFY_HOSTNAME` with a value such as `%.foo.live.mobsuccess.com`.

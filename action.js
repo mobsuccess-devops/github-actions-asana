@@ -7,6 +7,7 @@ const {
   moveTaskToProjectSection,
 } = require("./lib/actions/asana");
 
+const customFieldLive = require("./lib/asana/custom-fields/live");
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
 
@@ -232,6 +233,14 @@ exports.action = async function action() {
       } else {
         const updateOptions = {
           custom_fields: {
+            ...(process.env.AWS_AMPLIFY_HOSTNAME
+              ? {
+                  [customFieldLive.gid]: process.env.AWS_AMPLIFY_HOSTNAME.replace(
+                    "%",
+                    pullRequest.html_url.split("/").pop()
+                  ),
+                }
+              : {}),
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
           },
