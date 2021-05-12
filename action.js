@@ -12,6 +12,9 @@ const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status")
 
 const asanaSprintProjectId = "1200175269622723";
 const asanaSprintSectionIds = {
+  design: "1200175269622814",
+  readyToDo: "1200175269622815",
+  inProgress: "1200175269622840",
   toTest: "1200175269622816",
   ready: "1200175269622817",
 };
@@ -122,7 +125,7 @@ exports.getActionParameters = function getActionParameters() {
   return { pullRequest, action, triggerPhrase };
 };
 
-async function shouldMoveTaskToTest({ taskId, pullRequest }) {
+async function getTaksDestination({ taskId, pullRequest }) {
   const { draft, merged_at: mergedAt } = pullRequest;
   if (draft || !!mergedAt) {
     // do not move pulls in draft or already merged
@@ -169,7 +172,39 @@ async function shouldMoveTaskToTest({ taskId, pullRequest }) {
       return false;
     }
 
-    return true;
+    return asanaSprintSectionIds.toTest;
+  } else {
+    // user ms-testers is not currently requested
+    // if the PR is still open and the task is in the section “to test”, move it back
+    // to “in progress”
+    const task = await getTask(taskId, {
+      opt_fields: ["memberships", "completed"],
+    });
+    const { completed, memberships } = task;
+    if (completed) {
+      console.log(`Task ${taskId} is completed, not moving task`);
+      return false;
+    }
+
+    const sprintProjectMembership = memberships.find(
+      ({ project: { gid: projectId } }) => projectId === asanaSprintProjectId
+    );
+    if (!sprintProjectMembership) {
+      console.log(
+        `Task ${taskId} is not included in the current sprint, not moving task`
+      );
+      return false;
+    }
+
+    const {
+      section: { gid: sprintSectionId },
+    } = sprintProjectMembership;
+    if (sprintSectionId === asanaSprintSectionIds.toTest) {
+      console.log(
+        `Task ${taskId} is still in the To Test section of the current sprint, moving task to “in progress”`
+      );
+      return asanaSprintSectionIds.inProgress;
+    }
   }
 }
 
@@ -202,12 +237,23 @@ exports.action = async function action() {
           },
         };
 
-        if (await shouldMoveTaskToTest({ taskId, pullRequest })) {
+        const destination = getTaksDestination({ taskId, pullRequest });
+        if (destination === asanaSprintSectionIds.toTest) {
           console.log(`Moving Asana task to “to test” and remove assignments`);
           await moveTaskToProjectSection({
             taskId,
             projectId: asanaSprintProjectId,
             sectionId: asanaSprintSectionIds.toTest,
+          });
+          updateOptions.assignee = null;
+        } else if (destination === asanaSprintSectionIds.inProgress) {
+          console.log(
+            `Moving Asana task to “in progress” and remove assignments`
+          );
+          await moveTaskToProjectSection({
+            taskId,
+            projectId: asanaSprintProjectId,
+            sectionId: asanaSprintSectionIds.inProgress,
           });
           updateOptions.assignee = null;
         }
