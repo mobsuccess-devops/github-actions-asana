@@ -168,6 +168,8 @@ async function shouldMoveTaskToTest({ taskId, pullRequest }) {
       );
       return false;
     }
+
+    return true;
   }
 }
 
@@ -200,7 +202,7 @@ exports.action = async function action() {
           },
         };
 
-        if (shouldMoveTaskToTest({ taskId, pullRequest })) {
+        if (await shouldMoveTaskToTest({ taskId, pullRequest })) {
           console.log(`Moving Asana task to “to test” and remove assignments`);
           await moveTaskToProjectSection({
             taskId,
