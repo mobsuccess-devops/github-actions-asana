@@ -123,7 +123,8 @@ exports.getActionParameters = function getActionParameters() {
   const pullRequest = github.context.payload.pull_request;
   const action = core.getInput("action", { required: true });
   const triggerPhrase = core.getInput("trigger-phrase") || "";
-  return { pullRequest, action, triggerPhrase };
+  const amplifyUri = core.getInput("amplify-uri") || "";
+  return { pullRequest, action, triggerPhrase, amplifyUri };
 };
 
 async function getTaksDestination({ taskId, pullRequest }) {
@@ -210,7 +211,12 @@ async function getTaksDestination({ taskId, pullRequest }) {
 }
 
 exports.action = async function action() {
-  const { pullRequest, action, triggerPhrase } = exports.getActionParameters();
+  const {
+    pullRequest,
+    action,
+    triggerPhrase,
+    amplifyUri,
+  } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
@@ -231,12 +237,11 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
-        console.log("AWS_AMPLIFY_HOSTNAME", process.env.AWS_AMPLIFY_HOSTNAME);
         const updateOptions = {
           custom_fields: {
-            ...(process.env.AWS_AMPLIFY_HOSTNAME
+            ...(amplifyUri
               ? {
-                  [customFieldLive.gid]: process.env.AWS_AMPLIFY_HOSTNAME.replace(
+                  [customFieldLive.gid]: amplifyUri.replace(
                     "%",
                     pullRequest.html_url.split("/").pop()
                   ),

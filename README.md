@@ -16,4 +16,4 @@ The MS robot will automatically create a PR on your repository.
 
 If your repository is linked to AWS Amplify, you can dynamically update the
 Amplify hostname link. To do so, create a secret in your repository named
-`AWS_AMPLIFY_HOSTNAME` with a value such as `%.foo.live.mobsuccess.com`.
+`AWS_AMPLIFY_URI` with a value such as `%.foo.live.mobsuccess.com`.

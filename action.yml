@@ -13,6 +13,9 @@ inputs:
   github-token:
     description: "your github auth token"
     required: false
+  amplify-uri:
+    description: "the AWS Amplify URI template"
+    required: false
 branding:
   icon: "chevron-right"
   color: "gray-dark"

@@ -28,3 +28,4 @@ jobs:
           asana-pat: ${{ secrets.ASANA_PAT }}
           github-token: ${{ github.token }}
           action: "synchronize"
+          amplify-uri: ${{ secrets.AWS_AMPLIFY_URI }}
