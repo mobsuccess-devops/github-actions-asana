@@ -238,6 +238,7 @@ exports.action = async function action() {
         };
 
         const destination = getTaksDestination({ taskId, pullRequest });
+        console.log("DEBUG destination", destination);
         if (destination === asanaSprintSectionIds.toTest) {
           console.log(`Moving Asana task to “to test” and remove assignments`);
           await moveTaskToProjectSection({
