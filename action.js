@@ -129,6 +129,8 @@ async function shouldMoveTaskToTest({ taskId, pullRequest }) {
     return;
   }
   const { requested_reviewers: requestedReviewers } = pullRequest;
+  console.log("Requested reviewers:", requestedReviewers);
+
   if (requestedReviewers.some(({ login }) => login === "ms-testers")) {
     // user ms-testers has been requested a review
     // just to make sure, what is the current section of this task?
