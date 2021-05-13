@@ -1,0 +1,144 @@
+# DO NOT EDIT: BEGIN
+# This snippet has been inserted automatically by mobsuccessbot, do not edit!
+# If changes are needed, update the action npm in
+# https://github.com/mobsuccess-devops/github-mobsuccess-policy
+on:
+  push:
+    branches: [master, preprod, prod]
+  pull_request:
+    types: [opened, synchronize, reopened]
+name: NPM
+jobs:
+  packagejsonlint:
+    name: PackageJsonLint
+    runs-on: ubuntu-20.04
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mobsuccess-devops/github-actions-packagejsonlint@master
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Cache Node Modules
+        id: cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.MS_READ_PACKAGES_GITHUB_PAT }}" >> ~/.npmrc
+        name: Configure Credentials For GitHub Packages
+      - run: npm install
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: .
+      - run: npm run prettier
+        working-directory: .
+  eslint:
+    name: Eslint
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Cache Node Modules
+        id: cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.MS_READ_PACKAGES_GITHUB_PAT }}" >> ~/.npmrc
+        name: Configure Credentials For GitHub Packages
+      - run: npm install
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: .
+      - run: npm run eslint
+        working-directory: .
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Cache Node Modules
+        id: cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.MS_READ_PACKAGES_GITHUB_PAT }}" >> ~/.npmrc
+        name: Configure Credentials For GitHub Packages
+      - run: npm install
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: .
+      - run: npm run test
+        working-directory: .
+  package:
+    needs: [packagejsonlint, prettier, eslint, test]
+    name: Package
+    runs-on: ubuntu-20.04
+    timeout-minutes: 2
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Cache Node Modules
+        id: cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.MS_READ_PACKAGES_GITHUB_PAT }}" >> ~/.npmrc
+        name: Configure Credentials For GitHub Packages
+      - run: npm install
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: .
+      - run: npm version prerelease --preid=ci-$GITHUB_RUN_ID --no-git-tag-version
+        working-directory: .
+      - run: npm pack
+        working-directory: .
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: "*.tgz"
+  publish:
+    name: "Publish to GitHub Packages"
+    needs: [package]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 2
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Upload
+        uses: actions/download-artifact@v2
+        with:
+          name: package
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+          registry-url: https://npm.pkg.github.com/
+          scope: "@mobsuccess-devops"
+      - run: echo "registry=https://npm.pkg.github.com/@mobsuccess-devops" >> .npmrc
+      - run: npm publish $(ls *.tgz)
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+# DO NOT EDIT: END
