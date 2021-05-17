@@ -267,6 +267,7 @@ exports.action = async function action() {
 
         const { destination, shouldRemoveAssignee } =
           (await getTaskDestination({ taskId, pullRequest })) || {};
+        console.log("Got destination", { destination, shouldRemoveAssignee });
         if (shouldRemoveAssignee) {
           updateOptions.assignee = null;
         }
