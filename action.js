@@ -122,7 +122,7 @@ exports.getActionParameters = function getActionParameters() {
   return { pullRequest, action, triggerPhrase, amplifyUri };
 };
 
-async function getTaksDestination({ taskId, pullRequest }) {
+async function getTaskDestination({ taskId, pullRequest }) {
   const { draft, merged_at: mergedAt } = pullRequest;
   if (draft || !!mergedAt) {
     // do not move pulls in draft or already merged
@@ -140,7 +140,7 @@ async function getTaksDestination({ taskId, pullRequest }) {
     const { completed, memberships } = task;
     if (completed) {
       console.log(`Task ${taskId} is completed, not moving task`);
-      return false;
+      return;
     }
 
     const sprintProjectMembership = memberships.find(
@@ -150,7 +150,7 @@ async function getTaksDestination({ taskId, pullRequest }) {
       console.log(
         `Task ${taskId} is not included in the current sprint, not moving task`
       );
-      return false;
+      return;
     }
 
     const {
@@ -160,16 +160,19 @@ async function getTaksDestination({ taskId, pullRequest }) {
       console.log(
         `Task ${taskId} is already in the To Test section of the current sprint, not moving task`
       );
-      return false;
+      return;
     }
     if (sprintSectionId === asanaSprintSectionIds.ready) {
       console.log(
         `Task ${taskId} is in the Ready section of the current sprint, not moving task`
       );
-      return false;
+      return;
     }
 
-    return asanaSprintSectionIds.toTest;
+    return {
+      destination: asanaSprintSectionIds.toTest,
+      shouldRemoveAssignee: true,
+    };
   } else {
     // user ms-testers is not currently requested
     // if the PR is still open and the task is in the section “to test”, move it back
@@ -180,7 +183,7 @@ async function getTaksDestination({ taskId, pullRequest }) {
     const { completed, memberships } = task;
     if (completed) {
       console.log(`Task ${taskId} is completed, not moving task`);
-      return false;
+      return;
     }
 
     const sprintProjectMembership = memberships.find(
@@ -190,12 +193,21 @@ async function getTaksDestination({ taskId, pullRequest }) {
       console.log(
         `Task ${taskId} is not included in the current sprint, not moving task`
       );
-      return false;
+      return;
     }
 
     const {
       section: { gid: sprintSectionId },
     } = sprintProjectMembership;
+    if (sprintSectionId === asanaSprintSectionIds.toTest) {
+      console.log(
+        `Task ${taskId} is still in the “To Test” section of the current sprint, moving task to “In Progress”`
+      );
+      return {
+        destination: asanaSprintSectionIds.inProgress,
+        shouldRemoveAssignee: false,
+      };
+    }
     if (
       sprintSectionId === asanaSprintSectionIds.design ||
       sprintSectionId === asanaSprintSectionIds.readyToDo
@@ -203,7 +215,10 @@ async function getTaksDestination({ taskId, pullRequest }) {
       console.log(
         `Task ${taskId} is still in the ${sprintSectionId} section of the current sprint, moving task to “In Progress”`
       );
-      return asanaSprintSectionIds.inProgress;
+      return {
+        destination: asanaSprintSectionIds.inProgress,
+        shouldRemoveAssignee: true,
+      };
     }
   }
 }
@@ -250,25 +265,18 @@ exports.action = async function action() {
           },
         };
 
-        const destination = await getTaksDestination({ taskId, pullRequest });
-        if (destination === asanaSprintSectionIds.toTest) {
-          console.log(`Moving Asana task to “to test” and remove assignments`);
+        const { destination, shouldRemoveAssignee } =
+          (await getTaskDestination({ taskId, pullRequest })) || {};
+        if (shouldRemoveAssignee) {
+          updateOptions.assignee = null;
+        }
+        if (destination) {
+          console.log(`Moving Asana task to section ${destination}`);
           await moveTaskToProjectSection({
             taskId,
             projectId: asanaSprintProjectId,
-            sectionId: asanaSprintSectionIds.toTest,
+            sectionId: destination,
           });
-          updateOptions.assignee = null;
-        } else if (destination === asanaSprintSectionIds.inProgress) {
-          console.log(
-            `Moving Asana task to “in progress” and remove assignments`
-          );
-          await moveTaskToProjectSection({
-            taskId,
-            projectId: asanaSprintProjectId,
-            sectionId: asanaSprintSectionIds.inProgress,
-          });
-          updateOptions.assignee = null;
         }
 
         console.log(`Updating Asana task: ${taskId}`, updateOptions);
