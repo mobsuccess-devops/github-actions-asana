@@ -10,15 +10,10 @@ const {
 const customFieldLive = require("./lib/asana/custom-fields/live");
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
+const asanaMagics = require("@mobsuccess-devops/asana-magics");
 
-const asanaSprintProjectId = "1200175269622723";
-const asanaSprintSectionIds = {
-  design: "1200175269622814",
-  readyToDo: "1200175269622815",
-  inProgress: "1200175269622840",
-  toTest: "1200175269622816",
-  ready: "1200175269622817",
-};
+const asanaSprintProjectId = asanaMagics.projects.currentSprint.gid;
+const asanaSprintSectionIds = asanaMagics.projects.currentSprint.sections;
 
 exports.getPullReviewStatuses = async function getPullReviewStatuses({
   pullRequest,
@@ -201,9 +196,12 @@ async function getTaksDestination({ taskId, pullRequest }) {
     const {
       section: { gid: sprintSectionId },
     } = sprintProjectMembership;
-    if (sprintSectionId === asanaSprintSectionIds.toTest) {
+    if (
+      sprintSectionId === asanaSprintSectionIds.design ||
+      sprintSectionId === asanaSprintSectionIds.readyToDo
+    ) {
       console.log(
-        `Task ${taskId} is still in the To Test section of the current sprint, moving task to “in progress”`
+        `Task ${taskId} is still in the ${sprintSectionId} section of the current sprint, moving task to “In Progress”`
       );
       return asanaSprintSectionIds.inProgress;
     }
