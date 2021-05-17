@@ -15,10 +15,11 @@ const asanaMagics = require("@mobsuccess-devops/asana-magics");
 const asanaSprintProjectId = asanaMagics.projects.currentSprint.gid;
 const asanaSprintSectionIds = asanaMagics.projects.currentSprint.sections;
 
+const octokit = getOctokit();
+
 exports.getPullReviewStatuses = async function getPullReviewStatuses({
   pullRequest,
 }) {
-  const octokit = getOctokit();
   const { data: reviews } = await octokit.pulls.listReviews({
     ...github.context.repo,
     pull_number: pullRequest.number,
@@ -138,13 +139,12 @@ async function getTaskDestination({ taskId, pullRequest }) {
     console.log(
       `Found the pull requested to have a review requested from ms-testers, fix it`
     );
-    const octokit = getOctokit();
-    await octokit.rest.pulls.removeRequestedReviewers({
+    await octokit.pulls.removeRequestedReviewers({
       ...github.context.repo,
       pull_number: pullRequest.number,
       reviewers: ["ms-testers"],
     });
-    await octokit.rest.issues.addAssignees({
+    await octokit.issues.addAssignees({
       ...github.context.repo,
       issue_number: pullRequest.number,
       assignees: ["ms-testers"],
