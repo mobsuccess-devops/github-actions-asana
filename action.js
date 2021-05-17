@@ -128,11 +128,33 @@ async function getTaskDestination({ taskId, pullRequest }) {
     // do not move pulls in draft or already merged
     return;
   }
-  const { requested_reviewers: requestedReviewers } = pullRequest;
+  const { requested_reviewers: requestedReviewers, assignees } = pullRequest;
   console.log("Requested reviewers:", requestedReviewers);
 
+  // if review has been requested from ms-testers, this is probably bogus:
+  // someone wanted to assign the task to them and failed- update the
+  // task for them
   if (requestedReviewers.some(({ login }) => login === "ms-testers")) {
-    // user ms-testers has been requested a review
+    console.log(
+      `Found the pull requested to have a review requested from ms-testers, fix it`
+    );
+    const octokit = getOctokit();
+    await octokit.rest.pulls.removeRequestedReviewers({
+      ...github.context.repo,
+      pull_number: pullRequest.number,
+      reviewers: ["ms-testers"],
+    });
+    await octokit.rest.issues.addAssignees({
+      ...github.context.repo,
+      issue_number: pullRequest.number,
+      assignees: ["ms-testers"],
+    });
+
+    assignees.push({ login: "ms-testers" });
+  }
+
+  if (assignees.some(({ login }) => login === "ms-testers")) {
+    // user ms-testers has been assigned
     // just to make sure, what is the current section of this task?
     const task = await getTask(taskId, {
       opt_fields: ["memberships", "completed"],
@@ -174,7 +196,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
       shouldRemoveAssignee: true,
     };
   } else {
-    // user ms-testers is not currently requested
+    // user ms-testers is not currently assigned
     // if the PR is still open and the task is in the section “to test”, move it back
     // to “in progress”
     const task = await getTask(taskId, {
