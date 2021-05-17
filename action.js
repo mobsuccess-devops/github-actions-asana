@@ -205,7 +205,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
       );
       return {
         destination: asanaSprintSectionIds.inProgress,
-        shouldRemoveAssignee: false,
+        shouldRemoveAssignee: true,
       };
     }
     if (
@@ -217,7 +217,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
       );
       return {
         destination: asanaSprintSectionIds.inProgress,
-        shouldRemoveAssignee: true,
+        shouldRemoveAssignee: false,
       };
     }
   }
