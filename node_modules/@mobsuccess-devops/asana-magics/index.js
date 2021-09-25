@@ -43,4 +43,9 @@ module.exports = {
       },
     },
   },
+  users: {
+    github: {
+      gid: "1200114216411725",
+    },
+  },
 };
