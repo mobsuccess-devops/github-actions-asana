@@ -252,16 +252,22 @@ async function moveTaskToSprintAndEpicSection({ taskId, sectionId }) {
     opt_fields: ["memberships"],
   });
   const { memberships } = task;
-  console.log(`Found the following memberships: ${JSON.stringify(memberships)}`);
+  console.log(
+    `Found the following memberships: ${JSON.stringify(memberships)}`
+  );
   for (const {
     project: { gid: projectId },
   } of memberships) {
     if (projectId === asanaSprintProjectId) {
       // move task to section
-      console.log(`Found the Current Sprint project, moving to section ${sectionId}`);
+      console.log(
+        `Found the Current Sprint project, moving to section ${sectionId}`
+      );
       await moveTaskToProjectSection({ taskId, projectId, sectionId });
     } else {
-      console.log(`Found a project that is not the Current Sprint: ${projectId}`);
+      console.log(
+        `Found a project that is not the Current Sprint: ${projectId}`
+      );
       // this project is not the current sprint, see if we have a matching section
       const sections = await getProjectSections({ projectId });
       console.log(`Sections for this project: ${JSON.stringify(sections)}`);
@@ -288,7 +294,11 @@ async function moveTaskToSprintAndEpicSection({ taskId, sectionId }) {
       }
       const { gid: matchingSectionId } = matchingSection;
       console.log(`Moving task to section ${matchingSectionId}`);
-      await moveTaskToProjectSection({ taskId, projectId, matchingSectionId });
+      await moveTaskToProjectSection({
+        taskId,
+        projectId,
+        sectionId: matchingSectionId,
+      });
     }
   }
 }
