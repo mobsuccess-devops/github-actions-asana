@@ -291,7 +291,7 @@ exports.action = async function action() {
           (await getTaskDestination({ taskId, pullRequest })) || {};
         console.log("Got destination", { destination, shouldRemoveAssignee });
         if (shouldRemoveAssignee) {
-          updateOptions.assignee = null;
+          updateOptions['assignee'] = null;
         }
         if (destination) {
           console.log(`Moving Asana task to section ${destination}`);
