@@ -5,6 +5,7 @@ const {
   updateAsanaTask,
   getTask,
   moveTaskToProjectSection,
+  getProjectSections,
 } = require("./lib/actions/asana");
 
 const customFieldLive = require("./lib/asana/custom-fields/live");
@@ -245,6 +246,53 @@ async function getTaskDestination({ taskId, pullRequest }) {
   }
 }
 
+async function moveTaskToSprintAndEpicSection({ taskId, sectionId }) {
+  console.log(`Moving task ${taskId} to section ${sectionId}`);
+  const task = await getTask(taskId, {
+    opt_fields: ["memberships"],
+  });
+  const { memberships } = task;
+  console.log(`Found the following memberships: ${JSON.stringify(memberships)}`);
+  for (const {
+    project: { gid: projectId },
+  } of memberships) {
+    if (projectId === asanaSprintProjectId) {
+      // move task to section
+      console.log(`Found the Current Sprint project, moving to section ${sectionId}`);
+      await moveTaskToProjectSection({ taskId, projectId, sectionId });
+    } else {
+      console.log(`Found a project that is not the Current Sprint: ${projectId}`);
+      // this project is not the current sprint, see if we have a matching section
+      const sections = await getProjectSections({ projectId });
+      console.log(`Sections for this project: ${JSON.stringify(sections)}`);
+      const matchingSection = sections.find(({ name }) => {
+        switch (sectionId) {
+          case asanaSprintSectionIds.design:
+            return name.match(/design/i);
+          case asanaSprintSectionIds.readyToDo:
+            return name.match(/to ?do/i);
+          case asanaSprintSectionIds.inProgress:
+            return name.match(/in ?progress/i);
+          case asanaSprintSectionIds.toTest:
+            return name.match(/test/i);
+          case asanaSprintSectionIds.ready:
+            return name.match(/^ready$/i);
+        }
+      });
+      console.log(`Matching section: ${JSON.stringify(matchingSection)}`);
+      if (!matchingSection) {
+        console.log(
+          `Could not find a matching section, skipping to next project`
+        );
+        continue;
+      }
+      const { gid: matchingSectionId } = matchingSection;
+      console.log(`Moving task to section ${matchingSectionId}`);
+      await moveTaskToProjectSection({ taskId, projectId, matchingSectionId });
+    }
+  }
+}
+
 exports.action = async function action() {
   const {
     pullRequest,
@@ -291,13 +339,12 @@ exports.action = async function action() {
           (await getTaskDestination({ taskId, pullRequest })) || {};
         console.log("Got destination", { destination, shouldRemoveAssignee });
         if (shouldRemoveAssignee) {
-          updateOptions['assignee'] = null;
+          updateOptions["assignee"] = null;
         }
         if (destination) {
           console.log(`Moving Asana task to section ${destination}`);
-          await moveTaskToProjectSection({
+          await moveTaskToSprintAndEpicSection({
             taskId,
-            projectId: asanaSprintProjectId,
             sectionId: destination,
           });
         }
