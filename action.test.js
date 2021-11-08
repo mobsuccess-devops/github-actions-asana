@@ -12,6 +12,7 @@ describe("Asana GitHub actions", () => {
         repo: require("./__fixtures__/repo.js"),
       },
     }));
+    jest.mock("./lib/actions/octokit");
   });
 
   test("detect if pull request is draft", async () => {
@@ -40,15 +41,16 @@ describe("Asana GitHub actions", () => {
 
   describe("detect if pull request approval status", () => {
     const performTest = async (fixture, expectedResult) => {
-      jest.mock("./lib/actions/octokit");
-      const octokit = require("./lib/actions/octokit");
-      const { getPullReviewStatuses } = require("./action");
+      jest.resetModules();
+      jest.resetAllMocks();
       const listReviews = jest.fn(() => require(`./__fixtures__/${fixture}`));
-      octokit.mockReturnValue({
+      jest.mock("./lib/actions/octokit", () => jest.fn());
+      require("./lib/actions/octokit").mockReturnValue({
         pulls: {
           listReviews,
         },
       });
+      const { getPullReviewStatuses } = require("./action");
       expect(
         await getPullReviewStatuses({ pullRequest: { number: 1234 } })
       ).toEqual(expectedResult);
@@ -235,6 +237,7 @@ describe("Asana GitHub actions", () => {
     );
     expect(action.getActionParameters()).toEqual({
       pullRequest: { number: 1234 },
+      amplifyUri: "",
       action: "test-action",
       triggerPhrase: "test-trigger-phrase",
     });
@@ -243,6 +246,7 @@ describe("Asana GitHub actions", () => {
     );
     expect(action.getActionParameters()).toEqual({
       pullRequest: { number: 1234 },
+      amplifyUri: "",
       action: "test-action",
       triggerPhrase: "",
     });
@@ -278,6 +282,10 @@ describe("Asana GitHub actions", () => {
       jest.resetAllMocks();
       jest.resetModules();
       jest.mock("./lib/actions/asana");
+      require("./lib/actions/asana").getTask.mockImplementation(() => ({
+        completed: false,
+        memberships: [],
+      }));
       const { updateAsanaTask } = require("./lib/actions/asana");
 
       const action = require("./action");
@@ -285,6 +293,8 @@ describe("Asana GitHub actions", () => {
         number: 1234,
         body:
           "test-trigger-phrase https://app.asana.com/0/1200114135468212/1200114477821446/f",
+        requested_reviewers: [],
+        assignees: [],
       };
       jest.spyOn(action, "getActionParameters");
       action.getActionParameters.mockImplementation(() => ({
@@ -315,7 +325,7 @@ describe("Asana GitHub actions", () => {
         },
       });
     });
-    test("synchronize with missign task ID", async () => {
+    test("synchronize with missing task ID", async () => {
       jest.resetAllMocks();
       jest.resetModules();
       jest.mock("./lib/actions/asana");
@@ -325,6 +335,8 @@ describe("Asana GitHub actions", () => {
       const pullRequest = {
         number: 1234,
         body: "",
+        requested_reviewers: [],
+        assignees: [],
       };
       jest.spyOn(action, "getActionParameters");
       action.getActionParameters.mockImplementation(() => ({
