@@ -16,6 +16,9 @@ inputs:
   amplify-uri:
     description: "the AWS Amplify URI template"
     required: false
+  storybook-amplify-uri:
+    description: "the AWS Amplify Storybook URI template"
+    required: false
 branding:
   icon: "chevron-right"
   color: "gray-dark"
