@@ -9,6 +9,7 @@ const {
 } = require("./lib/actions/asana");
 
 const customFieldLive = require("./lib/asana/custom-fields/live");
+const customFieldStorybook = require("./lib/asana/custom-fields/storybook");
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
 const asanaMagics = require("@mobsuccess-devops/asana-magics");
@@ -121,7 +122,14 @@ exports.getActionParameters = function getActionParameters() {
   const action = core.getInput("action", { required: true });
   const triggerPhrase = core.getInput("trigger-phrase") || "";
   const amplifyUri = core.getInput("amplify-uri") || "";
-  return { pullRequest, action, triggerPhrase, amplifyUri };
+  const storybookAmplifyUri = core.getInput("storybook-amplify-uri") || "";
+  return {
+    pullRequest,
+    action,
+    triggerPhrase,
+    amplifyUri,
+    storybookAmplifyUri,
+  };
 };
 
 async function getTaskDestination({ taskId, pullRequest }) {
@@ -309,6 +317,7 @@ exports.action = async function action() {
     action,
     triggerPhrase,
     amplifyUri,
+    storybookAmplifyUri,
   } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
 
@@ -335,6 +344,14 @@ exports.action = async function action() {
             ...(amplifyUri
               ? {
                   [customFieldLive.gid]: amplifyUri.replace(
+                    "%",
+                    pullRequest.html_url.split("/").pop()
+                  ),
+                }
+              : {}),
+            ...(storybookAmplifyUri
+              ? {
+                  [customFieldStorybook.gid]: storybookAmplifyUri.replace(
                     "%",
                     pullRequest.html_url.split("/").pop()
                   ),
