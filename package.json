@@ -22,7 +22,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
-    "@mobsuccess-devops/asana-magics": "^1.0.1-ci-850166239.0",
+    "@mobsuccess-devops/asana-magics": "^1.0.1-ci-1434549171.0",
     "asana": "^0.18.5"
   },
   "devDependencies": {

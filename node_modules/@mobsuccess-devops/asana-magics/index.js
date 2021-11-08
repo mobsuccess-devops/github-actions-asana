@@ -27,6 +27,7 @@ module.exports = {
   },
   customFields: {
     live: { gid: "1200323257708391" },
+    storybook: { gid: "1201338340578371" },
     asanaPr: { gid: "1200114403104483" },
     asanaPrStatus: {
       gid: "1200114505696486",
