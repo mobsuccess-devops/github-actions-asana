@@ -379,12 +379,20 @@ exports.action = async function action() {
         console.log(`Updating Asana task: ${taskId}`, updateOptions);
         await updateAsanaTask(taskId, updateOptions);
 
-        const { completed } = await getTask(taskId, {
-          opt_fields: ["completed"],
-        });
-        console.log("Task is completed?", completed);
-        if (!completed) {
-          throw new Error("Asana task is not yet completed, blocking merge");
+        // fail the Action if the task is not draft and the task is not complete
+        const isDraft = await exports.getPullIsDraft({ pullRequest });
+        if (isDraft) {
+          console.log(
+            "Pull request in draft mode, not checking Asana task for completion"
+          );
+        } else {
+          const { completed } = await getTask(taskId, {
+            opt_fields: ["completed"],
+          });
+          console.log("Task is completed?", completed);
+          if (!completed) {
+            throw new Error("Asana task is not yet completed, blocking merge");
+          }
         }
       }
       break;
