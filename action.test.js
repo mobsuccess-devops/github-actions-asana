@@ -7,6 +7,7 @@ describe("Asana GitHub actions", () => {
     jest.resetAllMocks();
   });
   beforeAll(() => {
+    jest.mock("./lib/actions/octokit");
     jest.mock("@actions/github", () => ({
       context: {
         repo: require("./__fixtures__/repo.js"),
