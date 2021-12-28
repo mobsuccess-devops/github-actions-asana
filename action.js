@@ -378,6 +378,14 @@ exports.action = async function action() {
 
         console.log(`Updating Asana task: ${taskId}`, updateOptions);
         await updateAsanaTask(taskId, updateOptions);
+
+        const { completed } = await getTask(taskId, {
+          opt_fields: ["completed"],
+        });
+        console.log("Task is completed?", completed);
+        if (!completed) {
+          throw new Error("Asana task is not yet completed, blocking merge");
+        }
       }
       break;
     }
