@@ -11,6 +11,8 @@ on:
       - synchronize
       - closed
       - edited
+      - converted_to_draft
+      - ready_for_review
 
   pull_request_review:
     types:
