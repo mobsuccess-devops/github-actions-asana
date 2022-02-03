@@ -1,5 +1,6 @@
 const projectCurrentSprintSectionGid = {
   design: "1200175269622814",
+  trash: "1201438237708782",
   readyToDo: "1200175269622815",
   inProgress: "1200175269622840",
   toTest: "1200175269622816",
