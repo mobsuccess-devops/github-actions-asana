@@ -239,6 +239,7 @@ describe("Asana GitHub actions", () => {
     expect(action.getActionParameters()).toEqual({
       pullRequest: { number: 1234 },
       amplifyUri: "",
+      storybookAmplifyUri: "",
       action: "test-action",
       triggerPhrase: "test-trigger-phrase",
     });
@@ -248,6 +249,7 @@ describe("Asana GitHub actions", () => {
     expect(action.getActionParameters()).toEqual({
       pullRequest: { number: 1234 },
       amplifyUri: "",
+      storybookAmplifyUri: "",
       action: "test-action",
       triggerPhrase: "",
     });
@@ -284,7 +286,7 @@ describe("Asana GitHub actions", () => {
       jest.resetModules();
       jest.mock("./lib/actions/asana");
       require("./lib/actions/asana").getTask.mockImplementation(() => ({
-        completed: false,
+        completed: true,
         memberships: [],
       }));
       const { updateAsanaTask } = require("./lib/actions/asana");
@@ -325,6 +327,45 @@ describe("Asana GitHub actions", () => {
           1200114505696486: "test-value",
         },
       });
+    });
+    test("synchronize should failed for not completed task", async () => {
+      jest.resetAllMocks();
+      jest.resetModules();
+      jest.mock("./lib/actions/asana");
+      require("./lib/actions/asana").getTask.mockImplementation(() => ({
+        completed: false,
+        memberships: [],
+      }));
+
+      const action = require("./action");
+      const pullRequest = {
+        number: 1234,
+        body:
+          "test-trigger-phrase https://app.asana.com/0/1200114135468212/1200114477821446/f",
+        requested_reviewers: [],
+        assignees: [],
+      };
+      jest.spyOn(action, "getActionParameters");
+      action.getActionParameters.mockImplementation(() => ({
+        pullRequest,
+        action: "synchronize",
+        triggerPhrase: "test-trigger-phrase",
+      }));
+
+      const spyGetAsanaPRStatus = jest.spyOn(action, "getAsanaPRStatus");
+      action.getAsanaPRStatus.mockImplementation(() => "test-value");
+
+      try {
+        await action.action();
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toBe(
+          "Asana task is not yet completed, blocking merge"
+        );
+      }
+
+      expect(spyGetAsanaPRStatus).toHaveBeenCalledTimes(1);
+      expect(spyGetAsanaPRStatus).toHaveBeenLastCalledWith({ pullRequest });
     });
     test("synchronize with missing task ID", async () => {
       jest.resetAllMocks();
