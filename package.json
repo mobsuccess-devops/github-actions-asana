@@ -23,7 +23,7 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@mobsuccess-devops/asana-magics": "^1.0.1-ci-1517315035.0",
-    "asana": "^0.18.5"
+    "asana": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^7.22.0",

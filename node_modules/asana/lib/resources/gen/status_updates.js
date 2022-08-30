@@ -10,54 +10,71 @@ var Resource = require('../resource');
 var util = require('util');
 var _ = require('lodash');
 
-function Attachments(dispatcher) {
+function StatusUpdates(dispatcher) {
     Resource.call(this, dispatcher);
 }
-util.inherits(Attachments, Resource);
+util.inherits(StatusUpdates, Resource);
 
 
 /**
- * Delete an attachment
- * @param {String} attachmentGid: (required) Globally unique identifier for the attachment.
+ * Create a status update
  * @param {Object} data: Data for the request
  * @param {Object} [dispatchOptions]: Options, if any, to pass the dispatcher for the request
  * @return {Promise} The requested resource
  */
-Attachments.prototype.deleteAttachment = function(
-    attachmentGid,
+StatusUpdates.prototype.createStatusForObject = function(
     data,
     dispatchOptions
 ) {
-    var path = "/attachments/{attachment_gid}".replace("{attachment_gid}", attachmentGid);
+    var path = "/status_updates";
+
+    return this.dispatchPost(path, data, dispatchOptions)
+};
+
+
+/**
+ * Delete a status update
+ * @param {String} statusGid: (required) The status update to get.
+ * @param {Object} data: Data for the request
+ * @param {Object} [dispatchOptions]: Options, if any, to pass the dispatcher for the request
+ * @return {Promise} The requested resource
+ */
+StatusUpdates.prototype.deleteStatus = function(
+    statusGid,
+    data,
+    dispatchOptions
+) {
+    var path = "/status_updates/{status_gid}".replace("{status_gid}", statusGid);
 
     return this.dispatchDelete(path, data, dispatchOptions)
 };
 
 
 /**
- * Get an attachment
- * @param {String} attachmentGid: (required) Globally unique identifier for the attachment.
+ * Get a status update
+ * @param {String} statusGid: (required) The status update to get.
  * @param {Object} params: Parameters for the request
      - optFields {[String]}:  Defines fields to return. Some requests return *compact* representations of objects in order to conserve resources and complete the request more efficiently. Other times requests return more information than you may need. This option allows you to list the exact set of fields that the API should be sure to return for the objects. The field names should be provided as paths, described below. The id of included objects will always be returned, regardless of the field options.
      - optPretty {Boolean}:  Provides “pretty” output. Provides the response in a “pretty” format. In the case of JSON this means doing proper line breaking and indentation to make it readable. This will take extra time and increase the response size so it is advisable only to use this during debugging.
  * @param {Object} [dispatchOptions]: Options, if any, to pass the dispatcher for the request
  * @return {Promise} The requested resource
  */
-Attachments.prototype.getAttachment = function(
-    attachmentGid,
+StatusUpdates.prototype.getStatus = function(
+    statusGid,
     params,
     dispatchOptions
 ) {
-    var path = "/attachments/{attachment_gid}".replace("{attachment_gid}", attachmentGid);
+    var path = "/status_updates/{status_gid}".replace("{status_gid}", statusGid);
 
     return this.dispatchGet(path, params, dispatchOptions)
 };
 
 
 /**
- * Get attachments from an object
+ * Get status updates from an object
  * @param {Object} params: Parameters for the request
-     - parent {String}:  (required) Globally unique identifier for object to fetch statuses from. Must be a GID for a task or project_brief.
+     - parent {String}:  (required) Globally unique identifier for object to fetch statuses from. Must be a GID for a project, portfolio, or goal.
+     - createdSince {Date}:  Only return statuses that have been created since the given time.
      - offset {String}:  Offset token. An offset to the next page returned by the API. A pagination request will return an offset token, which can be used as an input parameter to the next request. If an offset is not passed in, the API will return the first page of results. 'Note: You can only pass in an offset that was returned to you via a previously paginated request.'
      - limit {Number}:  Results per page. The number of objects to return per page. The value must be between 1 and 100.
      - optFields {[String]}:  Defines fields to return. Some requests return *compact* representations of objects in order to conserve resources and complete the request more efficiently. Other times requests return more information than you may need. This option allows you to list the exact set of fields that the API should be sure to return for the objects. The field names should be provided as paths, described below. The id of included objects will always be returned, regardless of the field options.
@@ -65,14 +82,14 @@ Attachments.prototype.getAttachment = function(
  * @param {Object} [dispatchOptions]: Options, if any, to pass the dispatcher for the request
  * @return {Promise} The requested resource
  */
-Attachments.prototype.getAttachmentsForObject = function(
+StatusUpdates.prototype.getStatusesForObject = function(
     params,
     dispatchOptions
 ) {
-    var path = "/attachments";
+    var path = "/status_updates";
 
     return this.dispatchGetCollection(path, params, dispatchOptions)
 };
 
-module.exports = Attachments;
+module.exports = StatusUpdates;
 /* jshint ignore:end */

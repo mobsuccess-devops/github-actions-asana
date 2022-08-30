@@ -1,45 +1,45 @@
-attachments: 
-    createAttachmentForTask: >-
+projecttemplates: 
+    getProjectTemplate: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.createAttachmentForTask({field: "value", field: "value", pretty: true})
+        client.projecttemplates.getProjectTemplate(projectTemplateGid, {param: "value", param: "value", opt_pretty: true})
             .then((result) => {
                 console.log(result);
             });
-    deleteAttachment: >-
+    getProjectTemplates: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.deleteAttachment(attachmentGid)
+        client.projecttemplates.getProjectTemplates({param: "value", param: "value", opt_pretty: true})
             .then((result) => {
                 console.log(result);
             });
-    getAttachment: >-
+    getProjectTemplatesForTeam: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.getAttachment(attachmentGid, {param: "value", param: "value", opt_pretty: true})
+        client.projecttemplates.getProjectTemplatesForTeam(teamGid, {param: "value", param: "value", opt_pretty: true})
             .then((result) => {
                 console.log(result);
             });
-    getAttachmentsForObject: >-
+    instantiateProject: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.getAttachmentsForObject({param: "value", param: "value", opt_pretty: true})
+        client.projecttemplates.instantiateProject(projectTemplateGid, {field: "value", field: "value", pretty: true})
             .then((result) => {
                 console.log(result);
             });

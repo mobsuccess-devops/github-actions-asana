@@ -1,45 +1,45 @@
-attachments: 
-    createAttachmentForTask: >-
+statusupdates: 
+    createStatusForObject: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.createAttachmentForTask({field: "value", field: "value", pretty: true})
+        client.statusupdates.createStatusForObject({field: "value", field: "value", pretty: true})
             .then((result) => {
                 console.log(result);
             });
-    deleteAttachment: >-
+    deleteStatus: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.deleteAttachment(attachmentGid)
+        client.statusupdates.deleteStatus(statusGid)
             .then((result) => {
                 console.log(result);
             });
-    getAttachment: >-
+    getStatus: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.getAttachment(attachmentGid, {param: "value", param: "value", opt_pretty: true})
+        client.statusupdates.getStatus(statusGid, {param: "value", param: "value", opt_pretty: true})
             .then((result) => {
                 console.log(result);
             });
-    getAttachmentsForObject: >-
+    getStatusesForObject: >-
         const asana = require('asana');
 
 
         const client = asana.Client.create().useAccessToken('PERSONAL_ACCESS_TOKEN');
 
 
-        client.attachments.getAttachmentsForObject({param: "value", param: "value", opt_pretty: true})
+        client.statusupdates.getStatusesForObject({param: "value", param: "value", opt_pretty: true})
             .then((result) => {
                 console.log(result);
             });
