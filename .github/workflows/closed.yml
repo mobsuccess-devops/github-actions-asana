@@ -26,4 +26,15 @@ jobs:
     steps:
       - name: "Sync emoji in #mobsuccess-review-requested"
         run: 'curl -D /dev/stderr -s "${{ secrets.ZAPIER_REVIEW_REQUESTED_RED_CROSS }}?repo=${{ github.repository }}&pr=${{ github.event.number }}"'
+
+  CommentSubPRs:
+    if: github.event.pull_request.merged == true
+    name: "Comment rebase --onto on Sub PRs"
+    runs-on: ubuntu-20.04
+    timeout-minutes: 2
+    steps:
+      - uses: mobsuccess-devops/github-actions-mobsuccess@master
+        with:
+          github-token: ${{ github.token }}
+          action: "after-pr-merged"
 # DO NOT EDIT: END
