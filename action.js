@@ -7,6 +7,7 @@ const {
   moveTaskToProjectSection,
   getProjectSections,
 } = require("./lib/actions/asana");
+const { getMobsuccessYMLFromRepo } = require("./lib/mobsuccessyml");
 
 const customFieldLive = require("./lib/asana/custom-fields/live");
 const customFieldStorybook = require("./lib/asana/custom-fields/storybook");
@@ -118,12 +119,14 @@ exports.findAsanaTaskId = function findAsanaTaskId({
 };
 
 exports.getActionParameters = function getActionParameters() {
+  const repository = github.context.payload.repository;
   const pullRequest = github.context.payload.pull_request;
   const action = core.getInput("action", { required: true });
   const triggerPhrase = core.getInput("trigger-phrase") || "";
   const amplifyUri = core.getInput("amplify-uri") || "";
   const storybookAmplifyUri = core.getInput("storybook-amplify-uri") || "";
   return {
+    repository,
     pullRequest,
     action,
     triggerPhrase,
@@ -311,8 +314,31 @@ async function moveTaskToSprintAndEpicSection({ taskId, sectionId }) {
   }
 }
 
+async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
+  const { assignees } = pullRequest;
+  const assigneeLogins = assignees.map(({ login }) => login);
+  if (!assigneeLogins.some((login) => login === "ms-testers")) {
+    return false;
+  }
+
+  // if mobsuccess.yml has the `accept_ms_testers_without_closed_task` flag set to true, we can merge
+  const mobsuccessyml = await getMobsuccessYMLFromRepo({
+    owner: repository.owner.login,
+    repo: repository.name,
+  });
+  const asanaSettings = mobsuccessyml.asana || {};
+  if (asanaSettings.accept_ms_testers_without_closed_task) {
+    console.log(
+      "accept_ms_testers_without_closed_task is set to true, merging"
+    );
+    return true;
+  }
+  return false;
+}
+
 exports.action = async function action() {
   const {
+    repository,
     pullRequest,
     action,
     triggerPhrase,
@@ -391,7 +417,15 @@ exports.action = async function action() {
           });
           console.log("Task is completed?", completed);
           if (!completed) {
-            throw new Error("Asana task is not yet completed, blocking merge");
+            // check if can merge without a completed asana task
+            const canMergeWithoutAsanaTask = await checkIfCanMergeWithoutAsanaTask(
+              { repository, pullRequest }
+            );
+            if (!canMergeWithoutAsanaTask) {
+              throw new Error(
+                "Asana task is not yet completed, blocking merge"
+              );
+            }
           }
         }
       }
