@@ -355,14 +355,61 @@ describe("Asana GitHub actions", () => {
       const spyGetAsanaPRStatus = jest.spyOn(action, "getAsanaPRStatus");
       action.getAsanaPRStatus.mockImplementation(() => "test-value");
 
+      let errorHasBeenThrown = false;
       try {
         await action.action();
       } catch (error) {
+        errorHasBeenThrown = true;
         expect(error).toBeInstanceOf(Error);
         expect(error.message).toBe(
           "Asana task is not yet completed, blocking merge"
         );
       }
+      expect(errorHasBeenThrown).toBe(true);
+      expect(spyGetAsanaPRStatus).toHaveBeenCalledTimes(1);
+      expect(spyGetAsanaPRStatus).toHaveBeenLastCalledWith({ pullRequest });
+    });
+
+    test("synchronize should not fail for not completed task with asana: accept_ms_testers_without_closed_task", async () => {
+      jest.resetAllMocks();
+      jest.resetModules();
+      jest.mock("./lib/actions/asana");
+      require("./lib/actions/asana").getTask.mockImplementation(() => ({
+        completed: false,
+        memberships: [],
+      }));
+      jest.mock("./lib/mobsuccessyml");
+      require("./lib/mobsuccessyml").getMobsuccessYMLFromRepo.mockImplementation(
+        () => ({
+          asana: { accept_ms_testers_without_closed_task: true },
+        })
+      );
+
+      const action = require("./action");
+      const pullRequest = {
+        number: 1234,
+        body:
+          "test-trigger-phrase https://app.asana.com/0/1200114135468212/1200114477821446/f",
+        requested_reviewers: [],
+        assignees: [{ login: "ms-testers" }],
+      };
+      jest.spyOn(action, "getActionParameters");
+      action.getActionParameters.mockImplementation(() => ({
+        repository: {
+          owner: {
+            login: "test-owner",
+          },
+          name: "test-repo",
+        },
+        pullRequest,
+        action: "synchronize",
+        triggerPhrase: "test-trigger-phrase",
+      }));
+
+      const spyGetAsanaPRStatus = jest.spyOn(action, "getAsanaPRStatus");
+      action.getAsanaPRStatus.mockImplementation(() => "test-value");
+
+      await action.action();
 
       expect(spyGetAsanaPRStatus).toHaveBeenCalledTimes(1);
       expect(spyGetAsanaPRStatus).toHaveBeenLastCalledWith({ pullRequest });
