@@ -329,7 +329,7 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
   const asanaSettings = mobsuccessyml.asana || {};
   if (asanaSettings.accept_ms_testers_without_closed_task) {
     console.log(
-      "accept_ms_testers_without_closed_task is set to true, merging"
+      "accept_ms_testers_without_closed_task is set to true, ok to merge"
     );
     return true;
   }
