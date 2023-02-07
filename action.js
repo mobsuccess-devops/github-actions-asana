@@ -318,10 +318,6 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
   const { assignees } = pullRequest;
   const assigneeLogins = assignees.map(({ login }) => login);
   if (!assigneeLogins.some((login) => login === "ms-testers")) {
-    console.log(
-      "ms-testers is not assigned in " +
-        JSON.stringify({ assignees, assigneeLogins })
-    );
     return false;
   }
 
@@ -331,12 +327,6 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
     repo: repository.name,
     branch: pullRequest.head.ref,
   });
-  console.log(
-    "using mobsuccessyml " +
-      JSON.stringify(mobsuccessyml) +
-      " on branch " +
-      pullRequest.head.ref
-  );
   const asanaSettings = mobsuccessyml.asana || {};
   if (asanaSettings.accept_ms_testers_without_closed_task) {
     console.log(
@@ -364,13 +354,7 @@ exports.action = async function action() {
   //console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
 
-  console.info(
-    `Calling action ${action} with payload ${JSON.stringify(
-      { repository, pullRequest },
-      undefined,
-      4
-    )}`
-  );
+  console.info(`Calling action`);
   switch (action) {
     case "debug":
       console.log(
