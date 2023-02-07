@@ -354,7 +354,7 @@ exports.action = async function action() {
   //console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
 
-  console.info(`Calling action`);
+  console.info(`Calling action ${action}`);
   switch (action) {
     case "debug":
       console.log(
