@@ -353,7 +353,13 @@ exports.action = async function action() {
   //console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
 
-  console.info(`Calling action ${action}`);
+  console.info(
+    `Calling action ${action} with payload ${JSON.stringify(
+      { repository, pullRequest },
+      undefined,
+      4
+    )}`
+  );
   switch (action) {
     case "debug":
       console.log(
