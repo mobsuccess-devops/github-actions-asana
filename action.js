@@ -325,6 +325,7 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
   const mobsuccessyml = await getMobsuccessYMLFromRepo({
     owner: repository.owner.login,
     repo: repository.name,
+    branch: pullRequest.head.ref,
   });
   const asanaSettings = mobsuccessyml.asana || {};
   if (asanaSettings.accept_ms_testers_without_closed_task) {
