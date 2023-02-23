@@ -405,7 +405,7 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
-        console.Log(
+        console.log(
           "customFieldPullRequestDescription",
           customFieldPullRequestDescription
         );
