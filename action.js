@@ -13,6 +13,8 @@ const customFieldLive = require("./lib/asana/custom-fields/live");
 const customFieldStorybook = require("./lib/asana/custom-fields/storybook");
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
+const customFieldDeveloper = require("./lib/asana/custom-fields/developer");
+const customFieldPullRequestDescription = require("./lib/asana/custom-fields/pullRequestDescription");
 const asanaMagics = require("@mobsuccess-devops/asana-magics");
 
 const asanaSprintProjectId = asanaMagics.projects.currentSprint.gid;
@@ -51,6 +53,19 @@ exports.getPullReviewStatuses = async function getPullReviewStatuses({
     }),
     {}
   );
+};
+
+exports.getPullDeveloper = async function getPullDeveloper({ pullRequest }) {
+  const { developer: user } = pullRequest;
+
+  return user ? user.login : null;
+};
+
+exports.getPullDescription = async function getPullDescription({
+  pullRequest,
+}) {
+  const { body } = pullRequest;
+  return body ? body : null;
 };
 
 exports.getPullIsMerged = async function getPullIsMerged({ pullRequest }) {
@@ -363,6 +378,8 @@ exports.action = async function action() {
       );
       break;
     case "synchronize": {
+      console.log({ pullRequest });
+      console.log(exports.getPullDescription({ pullRequest }));
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
