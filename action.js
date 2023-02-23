@@ -378,8 +378,13 @@ exports.action = async function action() {
       );
       break;
     case "synchronize": {
-      console.log({ pullRequest });
-      console.log(exports.getPullDescription({ pullRequest }));
+      try {
+        console.log({ pullRequest });
+        console.log(exports.getPullDescription({ pullRequest }));
+      } catch (e) {
+        console.log(e.message);
+      }
+
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
