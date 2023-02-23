@@ -385,7 +385,7 @@ exports.action = async function action() {
     storybookAmplifyUri,
   } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
-  const description = exports.getPullRequestDescription({ pullRequest });
+  const description = exports.getPullDescription({ pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
@@ -405,10 +405,6 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
-        console.log(
-          "customFieldPullRequestDescription",
-          customFieldPullRequestDescription
-        );
         const updateOptions = {
           custom_fields: {
             ...(amplifyUri
