@@ -392,7 +392,7 @@ exports.action = async function action() {
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
   const assignee = exports.getPullAssignee({ pullRequest });
   const description = exports.getPullRequestDescription({ pullRequest });
-
+  console.log("assignee", assignee);
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
   });
