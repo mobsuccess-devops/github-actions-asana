@@ -111,7 +111,7 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   }
 };
 
-exports.findPullRequestDescription = function findPullRequestDescription({
+exports.getPullRequestDescription = function getPullRequestDescription({
   pullRequest,
 }) {
   const { body } = pullRequest;
@@ -131,7 +131,7 @@ exports.findPullRequestDescription = function findPullRequestDescription({
   //   foundDescription.join(",")
   // );
 
-  // return foundDescription.shift();
+  return body;
 };
 
 exports.findAsanaTaskId = function findAsanaTaskId({
@@ -385,6 +385,7 @@ exports.action = async function action() {
     storybookAmplifyUri,
   } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
+  const description = exports.getPullRequestDescription({ pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
@@ -401,17 +402,6 @@ exports.action = async function action() {
       );
       break;
     case "synchronize": {
-      try {
-        console.log("1 START DEBUG");
-        console.log(
-          "findPullRequestDescription",
-          exports.findPullRequestDescription({ pullRequest })
-        );
-        console.log("2 END DEBUG");
-      } catch (e) {
-        console.log(e.message);
-      }
-
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
@@ -435,6 +425,7 @@ exports.action = async function action() {
               : {}),
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
+            [customFieldPullRequestDescription.gid]: description,
           },
         };
 
