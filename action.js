@@ -104,6 +104,11 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   }
 };
 
+exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
+  const { user } = pullRequest;
+  return user ? user.login : null;
+};
+
 exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
   return body ? body : null;
@@ -383,12 +388,13 @@ exports.action = async function action() {
     storybookAmplifyUri,
   } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
+  const assignee = exports.getPullAssignee({ pullRequest });
   const description = exports.getPullDescription({ pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
   });
-  //console.log("pull", pullRequest);
+
   console.log("asanaPRStatus", asanaPRStatus);
 
   console.info(`Calling action ${action}`);
@@ -424,6 +430,7 @@ exports.action = async function action() {
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
             ["1204032332257162"]: description,
+            ["1204034768535484"]: assignee,
           },
         };
 
