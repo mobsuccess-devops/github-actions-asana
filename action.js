@@ -55,12 +55,6 @@ exports.getPullReviewStatuses = async function getPullReviewStatuses({
   );
 };
 
-exports.getPullDeveloper = async function getPullDeveloper({ pullRequest }) {
-  const { developer: user } = pullRequest;
-
-  return user ? user.login : null;
-};
-
 exports.getPullAssignee = async function getPullAssignee({ pullRequest }) {
   const { user } = pullRequest;
   return user ? user.login : null;
@@ -391,12 +385,12 @@ exports.action = async function action() {
   } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
   const assignee = exports.getPullAssignee({ pullRequest });
-  const description = exports.getPullRequestDescription({ pullRequest });
-  console.log("assignee", assignee);
+  const description = exports.getPullDescription({ pullRequest });
+
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
   });
-  //console.log("pull", pullRequest);
+
   console.log("asanaPRStatus", asanaPRStatus);
 
   console.info(`Calling action ${action}`);
@@ -411,10 +405,7 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
-        console.log(
-          "customFieldPullRequestDescription",
-          customFieldPullRequestDescription
-        );
+        console.log("assignee", assignee);
         const updateOptions = {
           custom_fields: {
             ...(amplifyUri
