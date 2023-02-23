@@ -409,7 +409,10 @@ exports.action = async function action() {
     case "synchronize": {
       try {
         console.log("START DEBUG");
-        console.log(exports.findPullRequestDescription({ pullRequest }));
+        console.log(
+          "findPullRequestDescription",
+          exports.findPullRequestDescription({ pullRequest })
+        );
         console.log("END DEBUG");
       } catch (e) {
         console.log(e.message);
