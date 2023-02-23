@@ -61,13 +61,6 @@ exports.getPullDeveloper = async function getPullDeveloper({ pullRequest }) {
   return user ? user.login : null;
 };
 
-exports.getPullDescription = async function getPullDescription({
-  pullRequest,
-}) {
-  const { body } = pullRequest;
-  return body ? body : null;
-};
-
 exports.getPullIsMerged = async function getPullIsMerged({ pullRequest }) {
   const { merged_at: mergedAt } = pullRequest;
   return !!mergedAt;
@@ -109,6 +102,11 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   } else {
     return customFieldPRStatus.values.inProgress;
   }
+};
+
+exports.getPullDescription = function getPullDescription({ pullRequest }) {
+  const { body } = pullRequest;
+  return body ? body : null;
 };
 
 exports.getPullRequestDescription = function getPullRequestDescription({
