@@ -429,7 +429,7 @@ exports.action = async function action() {
               : {}),
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
-            [customFieldPullRequestDescription.gid]: description,
+            ["1204032332257162"]: description,
           },
         };
 
