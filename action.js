@@ -111,6 +111,35 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   }
 };
 
+exports.findPullRequestDescription = function findPullRequestDescription({
+  pullRequest,
+}) {
+  const { body } = pullRequest;
+  const regexDescription = `### What does it do? Why?\\r\\n(?<description>.*)\\r\\n### Good To Know`;
+  const regex = new RegExp(regexDescription, "gi");
+
+  console.info(
+    "looking in body to find pull request description",
+    body,
+    "regexDescription",
+    regexDescription
+  );
+
+  let foundDescription = [];
+  let parsePullRequestBody;
+
+  while ((parsePullRequestBody = regex.exec(body)) !== null) {
+    const descriptionContent = parsePullRequestBody.groups.description;
+    foundDescription.push(descriptionContent);
+  }
+  console.info(
+    `found ${foundDescription.length} descriptionContent:`,
+    foundDescription.join(",")
+  );
+
+  return foundDescription.shift();
+};
+
 exports.findAsanaTaskId = function findAsanaTaskId({
   triggerPhrase,
   pullRequest,
@@ -379,8 +408,9 @@ exports.action = async function action() {
       break;
     case "synchronize": {
       try {
-        console.log({ pullRequest });
-        console.log(exports.getPullDescription({ pullRequest }));
+        console.log("START DEBUG");
+        console.log(exports.findPullRequestDescription({ pullRequest }));
+        console.log("END DEBUG");
       } catch (e) {
         console.log(e.message);
       }
