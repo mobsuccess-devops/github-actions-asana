@@ -106,6 +106,7 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
 
 exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
   const { user } = pullRequest;
+  console.log(user.login);
   return user ? user.login : null;
 };
 
