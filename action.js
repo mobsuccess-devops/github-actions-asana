@@ -115,29 +115,23 @@ exports.findPullRequestDescription = function findPullRequestDescription({
   pullRequest,
 }) {
   const { body } = pullRequest;
-  const regexDescription = `.`;
-  const regex = new RegExp(regexDescription, "gi");
 
-  console.info(
-    "looking in body to find pull request description",
-    body,
-    "regexDescription",
-    regexDescription
-  );
+  console.info("looking in body to find pull request description", body);
+  console.log("body", body);
 
-  let foundDescription = [];
-  let parsePullRequestBody;
+  // let foundDescription = [];
+  // let parsePullRequestBody;
 
-  while ((parsePullRequestBody = regex.exec(body)) !== null) {
-    const descriptionContent = parsePullRequestBody.groups.description;
-    foundDescription.push(descriptionContent);
-  }
-  console.info(
-    `found ${foundDescription.length} descriptionContent:`,
-    foundDescription.join(",")
-  );
+  // while ((parsePullRequestBody = regex.exec(body)) !== null) {
+  //   const descriptionContent = parsePullRequestBody.groups.description;
+  //   body.push(descriptionContent);
+  // }
+  // console.info(
+  //   `found ${foundDescription.length} descriptionContent:`,
+  //   foundDescription.join(",")
+  // );
 
-  return foundDescription.shift();
+  // return foundDescription.shift();
 };
 
 exports.findAsanaTaskId = function findAsanaTaskId({
