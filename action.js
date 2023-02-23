@@ -61,6 +61,11 @@ exports.getPullDeveloper = async function getPullDeveloper({ pullRequest }) {
   return user ? user.login : null;
 };
 
+exports.getPullAssignee = async function getPullAssignee({ pullRequest }) {
+  const { user } = pullRequest;
+  return user ? user.login : null;
+};
+
 exports.getPullDescription = async function getPullDescription({
   pullRequest,
 }) {
@@ -385,6 +390,7 @@ exports.action = async function action() {
     storybookAmplifyUri,
   } = exports.getActionParameters();
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
+  const assignee = exports.getPullAssignee({ pullRequest });
   const description = exports.getPullRequestDescription({ pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
@@ -430,6 +436,7 @@ exports.action = async function action() {
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
             ["1204032332257162"]: description,
+            ["1204034768535484"]: assignee,
           },
         };
 
