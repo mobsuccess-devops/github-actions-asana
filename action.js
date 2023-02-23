@@ -115,7 +115,7 @@ exports.findPullRequestDescription = function findPullRequestDescription({
   pullRequest,
 }) {
   const { body } = pullRequest;
-  const regexDescription = `### What does it do? Why?\\r\\n(?<description>.*)\\r\\n### Good To Know`;
+  const regexDescription = `(### What does it do\\? Why\\?\n)(?<description>[[:ascii:]]*)(### Good To Know)`;
   const regex = new RegExp(regexDescription, "gi");
 
   console.info(
