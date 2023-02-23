@@ -408,12 +408,12 @@ exports.action = async function action() {
       break;
     case "synchronize": {
       try {
-        console.log("START DEBUG");
+        console.log("1 START DEBUG");
         console.log(
           "findPullRequestDescription",
           exports.findPullRequestDescription({ pullRequest })
         );
-        console.log("END DEBUG");
+        console.log("2 END DEBUG");
       } catch (e) {
         console.log(e.message);
       }
