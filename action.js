@@ -387,7 +387,7 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
-        console.log(description);
+        console.log("SALUT", description);
         const updateOptions = {
           custom_fields: {
             ...(amplifyUri
