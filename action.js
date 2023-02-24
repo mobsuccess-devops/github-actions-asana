@@ -115,29 +115,6 @@ exports.getPullDescription = function getPullDescription({ pullRequest }) {
   return body ? body : null;
 };
 
-exports.getPullRequestDescription = function getPullRequestDescription({
-  pullRequest,
-}) {
-  const { body } = pullRequest;
-
-  console.info("looking in body to find pull request description", body);
-  console.log("body", body);
-
-  // let foundDescription = [];
-  // let parsePullRequestBody;
-
-  // while ((parsePullRequestBody = regex.exec(body)) !== null) {
-  //   const descriptionContent = parsePullRequestBody.groups.description;
-  //   body.push(descriptionContent);
-  // }
-  // console.info(
-  //   `found ${foundDescription.length} descriptionContent:`,
-  //   foundDescription.join(",")
-  // );
-
-  return body;
-};
-
 exports.findAsanaTaskId = function findAsanaTaskId({
   triggerPhrase,
   pullRequest,
@@ -410,6 +387,7 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
+        console.log(description);
         const updateOptions = {
           custom_fields: {
             ...(amplifyUri
