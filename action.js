@@ -381,6 +381,9 @@ exports.action = async function action() {
   const description = exports.getPullDescription({ pullRequest });
   // const qa = exports.getPullQA({ pullRequest });
 
+  console.log("assignee", assignee);
+  console.log("description", description);
+
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
   });
