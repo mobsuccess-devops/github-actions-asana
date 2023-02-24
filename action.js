@@ -125,6 +125,7 @@ exports.getActionParameters = function getActionParameters() {
   const triggerPhrase = core.getInput("trigger-phrase") || "";
   const amplifyUri = core.getInput("amplify-uri") || "";
   const storybookAmplifyUri = core.getInput("storybook-amplify-uri") || "";
+  const mergeGroup = core.getInput("merge-group");
   return {
     repository,
     pullRequest,
@@ -132,6 +133,7 @@ exports.getActionParameters = function getActionParameters() {
     triggerPhrase,
     amplifyUri,
     storybookAmplifyUri,
+    mergeGroup,
   };
 };
 
@@ -339,14 +341,8 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
 
 exports.action = async function action() {
   // check if we run on a merge_group
-  const { merge_group } = github.context.payload;
-  if (merge_group) {
-    console.log("merge_group", merge_group);
-  } else {
-    console.log("no merge_group");
-  }
-
   const {
+    mergeGroup,
     repository,
     pullRequest,
     action,
@@ -354,6 +350,11 @@ exports.action = async function action() {
     amplifyUri,
     storybookAmplifyUri,
   } = exports.getActionParameters();
+
+  if (mergeGroup) {
+    console.log("Running on a merge group - skipping Asana integration");
+    return;
+  }
 
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
 
