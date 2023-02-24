@@ -162,6 +162,11 @@ exports.getActionParameters = function getActionParameters() {
 
 async function getTaskDestination({ taskId, pullRequest }) {
   const { draft, merged_at: mergedAt } = pullRequest;
+  // if draft, move pull request to "In Progress"
+  if (draft) {
+    return customFieldPRStatus.values.inProgress;
+  }
+
   if (draft || !!mergedAt) {
     // do not move pulls in draft or already merged
     return;
