@@ -15,7 +15,7 @@ const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
 const customFieldPullRequestAssignee = require("./lib/asana/custom-fields/pullRequestAssignee");
 const customFieldPullRequestDescription = require("./lib/asana/custom-fields/pullRequestDescription");
-const customFieldPullRequestQA = require("./lib/asana/custom-fields/pullRequestQA");
+// const customFieldPullRequestQA = require("./lib/asana/custom-fields/pullRequestQA");
 const asanaMagics = require("@mobsuccess-devops/asana-magics");
 
 const asanaSprintProjectId = asanaMagics.projects.currentSprint.gid;
@@ -379,7 +379,7 @@ exports.action = async function action() {
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
   const assignee = exports.getPullAssignee({ pullRequest });
   const description = exports.getPullDescription({ pullRequest });
-  const qa = exports.getPullQA({ pullRequest });
+  // const qa = exports.getPullQA({ pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
