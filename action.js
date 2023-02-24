@@ -338,6 +338,14 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
 }
 
 exports.action = async function action() {
+  // check if we run on a merge_group
+  const { merge_group } = github.context.payload;
+  if (merge_group) {
+    console.log("merge_group", merge_group);
+  } else {
+    console.log("no merge_group");
+  }
+
   const {
     repository,
     pullRequest,
@@ -346,6 +354,7 @@ exports.action = async function action() {
     amplifyUri,
     storybookAmplifyUri,
   } = exports.getActionParameters();
+
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
