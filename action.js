@@ -92,10 +92,6 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
 
   console.log("pullRequest", { pullRequest });
 
-  if (isDraft) {
-    return customFieldPRStatus.values.inProgress;
-  }
-
   if (isMerged) {
     return customFieldPRStatus.values.merged;
   } else if (isDraft) {
@@ -172,7 +168,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
     return customFieldPRStatus.values.inProgress;
   }
 
-  if (draft || !!mergedAt) {
+  if (!mergedAt) {
     // do not move pulls in draft or already merged
     return;
   }
