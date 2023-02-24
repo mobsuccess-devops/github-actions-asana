@@ -69,7 +69,6 @@ exports.getPullIsMerged = async function getPullIsMerged({ pullRequest }) {
 
 exports.getPullIsDraft = async function getPullIsDraft({ pullRequest }) {
   const { draft } = pullRequest;
-  console.log("draft", { draft });
   return !!draft;
 };
 
@@ -90,6 +89,12 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
     numberOfRequestedReviewers,
     isDraft,
   });
+
+  console.log("pullRequest", { pullRequest });
+
+  if (isDraft) {
+    return customFieldPRStatus.values.inProgress;
+  }
 
   if (isMerged) {
     return customFieldPRStatus.values.merged;
