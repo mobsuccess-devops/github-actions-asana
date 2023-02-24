@@ -27,9 +27,9 @@ module.exports = {
     },
   },
   customFields: {
-    developer: { gid: "1204034768535484" },
+    pullRequestAssignee: { gid: "1204034768535484" },
     pullRequestDescription: { gid: "1204032332257162" },
-    QA: { gid: "1204054430312496" },
+    pullRequestQA: { gid: "1204054430312496" },
     live: { gid: "1200323257708391" },
     storybook: { gid: "1201338340578371" },
     asanaPr: { gid: "1200114403104483" },

@@ -13,7 +13,7 @@ const customFieldLive = require("./lib/asana/custom-fields/live");
 const customFieldStorybook = require("./lib/asana/custom-fields/storybook");
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
-const customFieldDeveloper = require("./lib/asana/custom-fields/developer");
+const customFieldPullRequestAssignee = require("./lib/asana/custom-fields/pullRequestAssignee");
 const customFieldPullRequestDescription = require("./lib/asana/custom-fields/pullRequestDescription");
 const asanaMagics = require("@mobsuccess-devops/asana-magics");
 
@@ -408,8 +408,8 @@ exports.action = async function action() {
               : {}),
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
-            ["1204032332257162"]: description,
-            ["1204034768535484"]: assignee,
+            [customFieldPullRequestAssignee]: description,
+            [customFieldPullRequestDescription.gid]: assignee,
           },
         };
 
