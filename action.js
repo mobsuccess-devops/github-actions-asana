@@ -166,10 +166,10 @@ async function getTaskDestination({ taskId, pullRequest }) {
   // if draft, move pull request to "In Progress"
   console.log("DFSKJGSDFLKGJSDFLKJGSD", draft);
 
-  if (draft || !!mergedAt) {
-    // do not move pulls in draft or already merged
-    return;
-  }
+  // if (draft || !!mergedAt) {
+  //   // do not move pulls in draft or already merged
+  //   return;
+  // }
   const { requested_reviewers: requestedReviewers, assignees } = pullRequest;
   console.log("Requested reviewers:", requestedReviewers);
 
