@@ -421,7 +421,7 @@ exports.action = async function action() {
             [customFieldPRStatus.gid]: asanaPRStatus,
             [customFieldPullRequestAssignee.gid]: description,
             [customFieldPullRequestDescription.gid]: assignee,
-            [customFieldPullRequestQA.gid]: QA,
+            // [customFieldPullRequestQA.gid]: QA,
           },
         };
 
