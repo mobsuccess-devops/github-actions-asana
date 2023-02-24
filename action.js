@@ -419,8 +419,8 @@ exports.action = async function action() {
               : {}),
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
-            [customFieldPullRequestAssignee.gid]: description,
-            [customFieldPullRequestDescription.gid]: assignee,
+            [customFieldPullRequestAssignee.gid]: assignee,
+            [customFieldPullRequestDescription.gid]: description,
             // [customFieldPullRequestQA.gid]: QA,
           },
         };
