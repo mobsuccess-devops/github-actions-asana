@@ -121,11 +121,11 @@ exports.findAsanaTaskId = function findAsanaTaskId({
 exports.getActionParameters = function getActionParameters() {
   const repository = github.context.payload.repository;
   const pullRequest = github.context.payload.pull_request;
+  const mergeGroup = github.context.payload.merge_group;
   const action = core.getInput("action", { required: true });
   const triggerPhrase = core.getInput("trigger-phrase") || "";
   const amplifyUri = core.getInput("amplify-uri") || "";
   const storybookAmplifyUri = core.getInput("storybook-amplify-uri") || "";
-  const mergeGroup = core.getInput("merge-group");
   return {
     repository,
     pullRequest,
