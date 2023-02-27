@@ -79,6 +79,7 @@ exports.getPullDescription = function getPullDescription({ pullRequest }) {
 
 exports.getPullQA = function getPullQA({ pullRequest }) {
   const { body } = pullRequest;
+  console.log("BODYYYYYYYY", body);
   const qa = body.split("### QA")[1].split("### Good To Know")[0].trim();
   return qa ? qa : null;
 };
