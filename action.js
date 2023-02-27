@@ -56,12 +56,6 @@ exports.getPullReviewStatuses = async function getPullReviewStatuses({
   );
 };
 
-exports.getPullDeveloper = async function getPullDeveloper({ pullRequest }) {
-  const { developer: user } = pullRequest;
-
-  return user ? user.login : null;
-};
-
 exports.getPullIsMerged = async function getPullIsMerged({ pullRequest }) {
   const { merged_at: mergedAt } = pullRequest;
   return !!mergedAt;
@@ -79,17 +73,21 @@ exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
 
 exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
-
-  // const regexString = (### What does it do\? Why\?\n)(?<description>[[:ascii:]]*)(### Good To Know)/
   const regexString = `(### What does it do? Why?\n)(?<description>[[:ascii:]]*)(### QA)`;
   const regex = new RegExp(regexString, "gi");
-  console.log("regex", { regex });
 
-  // exec regex on body
-  const match = regex.exec(body);
-  console.log("regexMatch", { match });
-
-  return match ? match : null;
+  console.info("looking in pr description", body, "regex", regexString);
+  let foundDescription = [];
+  let parseAsanaURL;
+  while ((parseAsanaURL = regex.exec(body)) !== null) {
+    const taskId = parseAsanaURL.groups.task;
+    foundDescription.push(taskId);
+  }
+  console.info(
+    `found ${foundDescription.length} taskIds:`,
+    foundDescription.join(",")
+  );
+  return foundDescription.shift();
 };
 
 exports.getPullQA = function getPullQA({ pullRequest }) {
