@@ -1,5 +1,3 @@
-// export an object with data which is a pull request's description
-
 module.exports = {
   data: {
     body: `### What does it do? Why?

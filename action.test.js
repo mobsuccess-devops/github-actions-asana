@@ -19,17 +19,37 @@ describe("Asana GitHub actions", () => {
   // add a test that detect if a pull request has a body
   test("detect if pull request has a body", async () => {
     const { getPullDescription } = require("./action");
-    const pullRequestDescription = require("./__fixtures__/pullRequest-description.js");
-    const string = pullRequestDescription.data.body;
-    const array = string.split("Why?")[1].trim().split("###")[0].trim();
+    const pullRequestDescription = require("./__fixtures__/pullRequest-body.js");
+    const data = pullRequestDescription.data.body;
+    const stringResult = data.split("Why?")[1].trim().split("###")[0].trim();
 
     expect(
       await getPullDescription({
         pullRequest: {
-          body: array,
+          body: stringResult,
         },
       })
     ).toBe("This is a test");
+  });
+
+  test("detect if pull request has a QA", async () => {
+    const { getPullDescription } = require("./action");
+    const pullRequestDescription = require("./__fixtures__/pullRequest-body.js");
+    const data = pullRequestDescription.data.body;
+    const stringResult = data
+      .split("### QA")[1]
+      .split("### Good To Know")[0]
+      .trim();
+
+    expect(
+      await getPullDescription({
+        pullRequest: {
+          body: stringResult,
+        },
+      })
+    ).toBe(
+      "You need to click on the Account button to see the new dropdown group menu."
+    );
   });
 
   test("detect if pull request is draft", async () => {
