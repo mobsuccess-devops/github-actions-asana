@@ -81,7 +81,7 @@ exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
 
   // const regexString = (### What does it do\? Why\?\n)(?<description>[[:ascii:]]*)(### Good To Know)/
-  const regexString = `(### What does it do? Why?\n)(?<description>[[:ascii:]]*)(### Good To Know))`;
+  const regexString = `(### What does it do? Why?\n)(?<description>[[:ascii:]]*)(### QA)`;
   const regex = new RegExp(regexString, "gi");
   console.log("regex", { regex });
 
@@ -89,7 +89,7 @@ exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const match = regex.exec(body);
   console.log("regexMatch", { match });
 
-  return body ? body : null;
+  return match ? match : null;
 };
 
 exports.getPullQA = function getPullQA({ pullRequest }) {
