@@ -101,8 +101,6 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
     isDraft,
   });
 
-  console.log("pullRequest", { pullRequest });
-
   if (isMerged) {
     return customFieldPRStatus.values.merged;
   } else if (isDraft) {
@@ -374,13 +372,9 @@ exports.action = async function action() {
   const description = exports.getPullDescription({ pullRequest });
   const qa = exports.getPullQA({ pullRequest });
 
-  console.log("test description", { description });
-
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
   });
-
-  console.log("asanaPRStatus", asanaPRStatus);
 
   console.info(`Calling action ${action}`);
   switch (action) {
