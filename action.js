@@ -72,6 +72,31 @@ exports.getPullIsDraft = async function getPullIsDraft({ pullRequest }) {
   return !!draft;
 };
 
+exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
+  const { user } = pullRequest;
+  return user ? user.login : null;
+};
+
+exports.getPullDescription = function getPullDescription({ pullRequest }) {
+  const { body } = pullRequest;
+
+  // const regexString = (### What does it do\? Why\?\n)(?<description>[[:ascii:]]*)(### Good To Know)/
+  const regexString = `(### What does it do? Why?\n)(?<description>[[:ascii:]]*)(### Good To Know))`;
+  const regex = new RegExp(regexString, "gi");
+  console.log("regex", { regex });
+
+  // exec regex on body
+  const match = regex.exec(body);
+  console.log("regexMatch", { match });
+
+  return body ? body : null;
+};
+
+exports.getPullQA = function getPullQA({ pullRequest }) {
+  const { body } = pullRequest;
+  return body ? body : null;
+};
+
 exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   const { isApproved, isRejected } = await exports.getPullReviewStatuses({
     pullRequest,
@@ -105,21 +130,6 @@ exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
   } else {
     return customFieldPRStatus.values.inProgress;
   }
-};
-
-exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
-  const { user } = pullRequest;
-  return user ? user.login : null;
-};
-
-exports.getPullDescription = function getPullDescription({ pullRequest }) {
-  const { body } = pullRequest;
-  return body ? body : null;
-};
-
-exports.getPullQA = function getPullQA({ pullRequest }) {
-  const { body } = pullRequest;
-  return body ? body : null;
 };
 
 exports.findAsanaTaskId = function findAsanaTaskId({
@@ -163,13 +173,11 @@ exports.getActionParameters = function getActionParameters() {
 
 async function getTaskDestination({ taskId, pullRequest }) {
   const { draft, merged_at: mergedAt } = pullRequest;
-  // if draft, move pull request to "In Progress"
-  console.log("DFSKJGSDFLKGJSDFLKJGSD", draft);
 
-  // if (draft || !!mergedAt) {
-  //   // do not move pulls in draft or already merged
-  //   return;
-  // }
+  if (draft || !!mergedAt) {
+    // do not move pulls in draft or already merged
+    return;
+  }
   const { requested_reviewers: requestedReviewers, assignees } = pullRequest;
   console.log("Requested reviewers:", requestedReviewers);
 
