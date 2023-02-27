@@ -388,9 +388,7 @@ exports.action = async function action() {
   const description = exports.getPullDescription({ pullRequest });
   const qa = exports.getPullQA({ pullRequest });
 
-  console.log("test pr status", customFieldPRStatus);
-  console.log("test assignee", customFieldPullRequestAssignee);
-  console.log("test description", customFieldPullRequestDescription);
+  console.log("test description", { description });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
