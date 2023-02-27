@@ -73,26 +73,14 @@ exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
 
 exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
-  const regexString = `(### What does it do? Why?\n)(?<description>[[:ascii:]]*)(### QA)`;
-  const regex = new RegExp(regexString, "gi");
-
-  console.info("looking in pr description", body, "regex", regexString);
-  let foundDescription = [];
-  let parseAsanaURL;
-  while ((parseAsanaURL = regex.exec(body)) !== null) {
-    const taskId = parseAsanaURL.groups.task;
-    foundDescription.push(taskId);
-  }
-  console.info(
-    `found ${foundDescription.length} taskIds:`,
-    foundDescription.join(",")
-  );
-  return foundDescription.shift();
+  const description = body.split("Why?")[1].split("###")[0].trim();
+  return description ? description : null;
 };
 
 exports.getPullQA = function getPullQA({ pullRequest }) {
   const { body } = pullRequest;
-  return body ? body : null;
+  const qa = body.split("### QA")[1].split("### Good To Know")[0].trim();
+  return qa ? qa : null;
 };
 
 exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
