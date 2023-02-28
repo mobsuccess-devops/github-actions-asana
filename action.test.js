@@ -16,7 +16,6 @@ describe("Asana GitHub actions", () => {
     jest.mock("./lib/actions/octokit");
   });
 
-  // add a test that detect if a pull request has a body
   test("detect if pull request has a body", async () => {
     const { getPullDescription } = require("./action");
     const pullRequestDescription = require("./__fixtures__/pullRequest-body.js");
