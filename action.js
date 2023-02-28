@@ -73,13 +73,21 @@ exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
 
 exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
-  const description = body.split("Why?")[1].split("###")[0].trim();
+  console.log("bodyyyyy", { body });
+  let description;
+  try {
+    description = body?.split("Why?")[1].split("###")[0].trim();
+  } catch (e) {
+    console.log("error11111", e);
+    console.log("error22222", e.message);
+  }
+  console.log("descriptiondescriptiondescriptiondescription", { description });
   return description ? description : null;
 };
 
 exports.getPullQA = function getPullQA({ pullRequest }) {
   const { body } = pullRequest;
-  const qa = body.split("### QA")[1].split("### Good To Know")[0].trim();
+  const qa = body?.split("### QA")[1].split("### Good To Know")[0].trim();
   return qa ? qa : null;
 };
 
