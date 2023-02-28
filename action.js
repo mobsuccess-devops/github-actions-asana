@@ -74,13 +74,9 @@ exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
 exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
   console.log("bodyyyyy", { body });
-  let description;
-  try {
-    description = body?.split("Why?")[1].split("###")[0].trim();
-  } catch (e) {
-    console.log("error11111", e);
-    console.log("error22222", e.message);
-  }
+
+  const description = body?.split("Why?")[1].split("###")[0].trim();
+
   console.log("descriptiondescriptiondescriptiondescription", { description });
   return description ? description : null;
 };
