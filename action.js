@@ -73,11 +73,7 @@ exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
 
 exports.getPullDescription = function getPullDescription({ pullRequest }) {
   const { body } = pullRequest;
-  console.log("bodyyyyy", { body });
-
   const description = body?.split("Why?")[1].split("###")[0].trim();
-
-  console.log("descriptiondescriptiondescriptiondescription", { description });
   return description ? description : null;
 };
 
