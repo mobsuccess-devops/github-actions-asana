@@ -13,6 +13,9 @@ const customFieldLive = require("./lib/asana/custom-fields/live");
 const customFieldStorybook = require("./lib/asana/custom-fields/storybook");
 const customFieldPR = require("./lib/asana/custom-fields/asana-pr");
 const customFieldPRStatus = require("./lib/asana/custom-fields/asana-pr-status");
+const customFieldPullRequestAssignee = require("./lib/asana/custom-fields/pullRequestAssignee");
+const customFieldPullRequestDescription = require("./lib/asana/custom-fields/pullRequestDescription");
+const customFieldPullRequestQA = require("./lib/asana/custom-fields/pullRequestQA");
 const asanaMagics = require("@mobsuccess-devops/asana-magics");
 
 const asanaSprintProjectId = asanaMagics.projects.currentSprint.gid;
@@ -61,6 +64,23 @@ exports.getPullIsMerged = async function getPullIsMerged({ pullRequest }) {
 exports.getPullIsDraft = async function getPullIsDraft({ pullRequest }) {
   const { draft } = pullRequest;
   return !!draft;
+};
+
+exports.getPullAssignee = function getPullAssignee({ pullRequest }) {
+  const { user } = pullRequest;
+  return user ? user.login : null;
+};
+
+exports.getPullDescription = function getPullDescription({ pullRequest }) {
+  const { body } = pullRequest;
+  const description = body.split("Why?")[1].split("###")[0].trim();
+  return description ? description : null;
+};
+
+exports.getPullQA = function getPullQA({ pullRequest }) {
+  const { body } = pullRequest;
+  const qa = body.split("### QA")[1].split("### Good To Know")[0].trim();
+  return qa ? qa : null;
 };
 
 exports.getAsanaPRStatus = async function getAsanaPRStatus({ pullRequest }) {
@@ -357,6 +377,9 @@ exports.action = async function action() {
   }
 
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
+  const assignee = exports.getPullAssignee({ pullRequest });
+  const description = exports.getPullDescription({ pullRequest });
+  const qa = exports.getPullQA({ pullRequest });
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
@@ -396,6 +419,9 @@ exports.action = async function action() {
               : {}),
             [customFieldPR.gid]: pullRequest.html_url,
             [customFieldPRStatus.gid]: asanaPRStatus,
+            [customFieldPullRequestAssignee.gid]: assignee,
+            [customFieldPullRequestDescription.gid]: description,
+            [customFieldPullRequestQA.gid]: qa,
           },
         };
 
