@@ -1,0 +1,32 @@
+# DO NOT EDIT: BEGIN
+# This snippet has been inserted automatically by mobsuccessbot, do not edit!
+# If changes are needed, update the action yamllint in
+# https://github.com/mobsuccess-devops/github-mobsuccess-policy
+name: Validate-YAML
+
+on:
+  merge_group:
+    types:
+      - checks_requested
+  push:
+    branches: [master, preprod, prod]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-yaml:
+    name: Validate YAML files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate YAML files
+        run: |
+          if [ -f .yamllint.yml ]; then
+            yamllint -c .yamllint.yml .
+          elif [ -f .gitignore ]; then
+            yamllint -d "{extends: relaxed, ignore-from-file: [.gitignore], rules: {line-length: disable}}" .
+          else
+            yamllint -d "{extends: relaxed, rules: {line-length: disable}}" .
+          fi
+
+# DO NOT EDIT: END
