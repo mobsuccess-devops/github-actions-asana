@@ -19,14 +19,11 @@ describe("Asana GitHub actions", () => {
   test("detect if pull request has a body", async () => {
     const { getPullDescription } = require("./action");
     const pullRequestDescription = require("./__fixtures__/pullRequest-body.js");
-    const data = pullRequestDescription.data.body;
-    const stringResult = data.split("Why?")[1].split("###")[0].trim();
+    const { body } = pullRequestDescription.data;
 
     expect(
       await getPullDescription({
-        pullRequest: {
-          body: stringResult,
-        },
+        pullRequest: { body },
       })
     ).toBe("This is a test");
   });
@@ -34,17 +31,11 @@ describe("Asana GitHub actions", () => {
   test("detect if pull request has a QA", async () => {
     const { getPullQA } = require("./action");
     const pullRequestQA = require("./__fixtures__/pullRequest-body.js");
-    const data = pullRequestQA.data.body;
-    const stringResult = data
-      .split("### QA")[1]
-      .split("### Good To Know")[0]
-      .trim();
+    const { body } = pullRequestQA.data;
 
     expect(
       await getPullQA({
-        pullRequest: {
-          body: stringResult,
-        },
+        pullRequest: { body },
       })
     ).toBe(
       "You need to click on the Account button to see the new dropdown group menu."
@@ -360,6 +351,9 @@ describe("Asana GitHub actions", () => {
         custom_fields: {
           1200114403104483: undefined,
           1200114505696486: "test-value",
+          1204032332257162: null,
+          1204034768535484: null,
+          1204054430312496: null,
         },
       });
     });
