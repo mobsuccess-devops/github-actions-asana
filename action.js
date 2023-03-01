@@ -351,6 +351,8 @@ exports.action = async function action() {
     storybookAmplifyUri,
   } = exports.getActionParameters();
 
+  console.log("GitHub Context", github.context.payload);
+
   if (mergeGroup) {
     console.log("Running on a merge group - skipping Asana integration");
     return;
