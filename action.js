@@ -177,8 +177,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
     // do not move pulls in draft or already merged
     return;
   }
-  const { requested_reviewers: requestedReviewers, assignees } = pullRequest;
-  console.log("Requested reviewers:", requestedReviewers);
+  const { assignees } = pullRequest;
 
   if (assignees.some(({ login }) => login === "ms-testers")) {
     // user ms-testers has been assigned
@@ -419,18 +418,20 @@ exports.action = async function action() {
         },
       };
 
-      const { destination, shouldRemoveAssignee } =
-        (await getTaskDestination({ taskId, pullRequest })) || {};
-      console.log("Got destination", { destination, shouldRemoveAssignee });
-      if (shouldRemoveAssignee) {
-        updateOptions["assignee"] = null;
-      }
-      if (destination) {
-        console.log(`Moving Asana task to section ${destination}`);
-        await moveTaskToSprintAndEpicSection({
-          taskId,
-          sectionId: destination,
-        });
+      if (["assigned", "unassigned"].includes(triggerEvent.type)) {
+        const { destination, shouldRemoveAssignee } =
+          (await getTaskDestination({ taskId, pullRequest })) || {};
+        console.log("Got destination", { destination, shouldRemoveAssignee });
+        if (shouldRemoveAssignee) {
+          updateOptions["assignee"] = null;
+        }
+        if (destination) {
+          console.log(`Moving Asana task to section ${destination}`);
+          await moveTaskToSprintAndEpicSection({
+            taskId,
+            sectionId: destination,
+          });
+        }
       }
 
       console.log(`Updating Asana task: ${taskId}`, updateOptions);
@@ -441,6 +442,12 @@ exports.action = async function action() {
       if (isDraft) {
         console.log(
           "Pull request in draft mode, not checking Asana task for completion"
+        );
+        break;
+      }
+      if (["closed"].includes(triggerEvent.type)) {
+        console.log(
+          `Pull request triggered by an event we chose to ignore: ${triggerEvent.type}`
         );
         break;
       }
