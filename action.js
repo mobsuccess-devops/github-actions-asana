@@ -384,69 +384,69 @@ exports.action = async function action() {
     case "synchronize": {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
-      } else {
-        const updateOptions = {
-          custom_fields: {
-            ...(amplifyUri
-              ? {
-                  [customFieldLive.gid]: amplifyUri.replace(
-                    "%",
-                    pullRequest.html_url.split("/").pop()
-                  ),
-                }
-              : {}),
-            ...(storybookAmplifyUri
-              ? {
-                  [customFieldStorybook.gid]: storybookAmplifyUri.replace(
-                    "%",
-                    pullRequest.html_url.split("/").pop()
-                  ),
-                }
-              : {}),
-            [customFieldPR.gid]: pullRequest.html_url,
-            [customFieldPRStatus.gid]: asanaPRStatus,
-          },
-        };
+        break;
+      }
 
-        const { destination, shouldRemoveAssignee } =
-          (await getTaskDestination({ taskId, pullRequest })) || {};
-        console.log("Got destination", { destination, shouldRemoveAssignee });
-        if (shouldRemoveAssignee) {
-          updateOptions["assignee"] = null;
-        }
-        if (destination) {
-          console.log(`Moving Asana task to section ${destination}`);
-          await moveTaskToSprintAndEpicSection({
-            taskId,
-            sectionId: destination,
-          });
-        }
+      const updateOptions = {
+        custom_fields: {
+          ...(amplifyUri
+            ? {
+                [customFieldLive.gid]: amplifyUri.replace(
+                  "%",
+                  pullRequest.html_url.split("/").pop()
+                ),
+              }
+            : {}),
+          ...(storybookAmplifyUri
+            ? {
+                [customFieldStorybook.gid]: storybookAmplifyUri.replace(
+                  "%",
+                  pullRequest.html_url.split("/").pop()
+                ),
+              }
+            : {}),
+          [customFieldPR.gid]: pullRequest.html_url,
+          [customFieldPRStatus.gid]: asanaPRStatus,
+        },
+      };
 
-        console.log(`Updating Asana task: ${taskId}`, updateOptions);
-        await updateAsanaTask(taskId, updateOptions);
+      const { destination, shouldRemoveAssignee } =
+        (await getTaskDestination({ taskId, pullRequest })) || {};
+      console.log("Got destination", { destination, shouldRemoveAssignee });
+      if (shouldRemoveAssignee) {
+        updateOptions["assignee"] = null;
+      }
+      if (destination) {
+        console.log(`Moving Asana task to section ${destination}`);
+        await moveTaskToSprintAndEpicSection({
+          taskId,
+          sectionId: destination,
+        });
+      }
 
-        // fail the Action if the task is not draft and the task is not complete
-        const isDraft = await exports.getPullIsDraft({ pullRequest });
-        if (isDraft) {
-          console.log(
-            "Pull request in draft mode, not checking Asana task for completion"
-          );
-        } else {
-          const { completed } = await getTask(taskId, {
-            opt_fields: ["completed"],
-          });
-          console.log("Task is completed?", completed);
-          if (!completed) {
-            // check if can merge without a completed asana task
-            const canMergeWithoutAsanaTask = await checkIfCanMergeWithoutAsanaTask(
-              { repository, pullRequest }
-            );
-            if (!canMergeWithoutAsanaTask) {
-              throw new Error(
-                "Asana task is not yet completed, blocking merge"
-              );
-            }
-          }
+      console.log(`Updating Asana task: ${taskId}`, updateOptions);
+      await updateAsanaTask(taskId, updateOptions);
+
+      // fail the Action if the task is not draft and the task is not complete
+      const isDraft = await exports.getPullIsDraft({ pullRequest });
+      if (isDraft) {
+        console.log(
+          "Pull request in draft mode, not checking Asana task for completion"
+        );
+        break;
+      }
+      const { completed } = await getTask(taskId, {
+        opt_fields: ["completed"],
+      });
+      console.log("Task is completed?", completed);
+      if (!completed) {
+        // check if can merge without a completed asana task
+        const canMergeWithoutAsanaTask = await checkIfCanMergeWithoutAsanaTask({
+          repository,
+          pullRequest,
+        });
+        if (!canMergeWithoutAsanaTask) {
+          throw new Error("Asana task is not yet completed, blocking merge");
         }
       }
       break;
