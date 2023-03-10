@@ -142,13 +142,13 @@ exports.getActionParameters = function getActionParameters() {
   };
 };
 
-async function getTaskDestination({ taskId, pullRequest }) {
+async function moveMSTestersFromReviewerToAssignee({ pullRequest }) {
   const { draft, merged_at: mergedAt } = pullRequest;
   if (draft || !!mergedAt) {
-    // do not move pulls in draft or already merged
+    // ignore pulls in draft or already merged
     return;
   }
-  const { requested_reviewers: requestedReviewers, assignees } = pullRequest;
+  const { requested_reviewers: requestedReviewers } = pullRequest;
   console.log("Requested reviewers:", requestedReviewers);
 
   // if review has been requested from ms-testers, this is probably bogus:
@@ -168,9 +168,17 @@ async function getTaskDestination({ taskId, pullRequest }) {
       issue_number: pullRequest.number,
       assignees: ["ms-testers"],
     });
-
-    assignees.push({ login: "ms-testers" });
   }
+}
+
+async function getTaskDestination({ taskId, pullRequest }) {
+  const { draft, merged_at: mergedAt } = pullRequest;
+  if (draft || !!mergedAt) {
+    // do not move pulls in draft or already merged
+    return;
+  }
+  const { requested_reviewers: requestedReviewers, assignees } = pullRequest;
+  console.log("Requested reviewers:", requestedReviewers);
 
   if (assignees.some(({ login }) => login === "ms-testers")) {
     // user ms-testers has been assigned
@@ -367,10 +375,7 @@ exports.action = async function action() {
 
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
 
-  const asanaPRStatus = await exports.getAsanaPRStatus({
-    pullRequest,
-  });
-  //console.log("pull", pullRequest);
+  const asanaPRStatus = await exports.getAsanaPRStatus({ pullRequest });
   console.log("asanaPRStatus", asanaPRStatus);
 
   console.info(`Calling action ${action}`);
@@ -382,6 +387,10 @@ exports.action = async function action() {
       );
       break;
     case "synchronize": {
+      if (triggerEvent.type === "review_requested") {
+        await moveMSTestersFromReviewerToAssignee({ pullRequest });
+      }
+
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
         break;
