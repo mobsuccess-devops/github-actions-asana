@@ -386,7 +386,7 @@ exports.action = async function action() {
       );
       break;
     case "synchronize": {
-      if (triggerEvent.type === "review_requested") {
+      if (triggerEvent?.type === "review_requested") {
         await moveMSTestersFromReviewerToAssignee({ pullRequest });
       }
 
@@ -418,7 +418,7 @@ exports.action = async function action() {
         },
       };
 
-      if (["assigned", "unassigned"].includes(triggerEvent.type)) {
+      if (["assigned", "unassigned"].includes(triggerEvent?.type)) {
         const { destination, shouldRemoveAssignee } =
           (await getTaskDestination({ taskId, pullRequest })) || {};
         console.log("Got destination", { destination, shouldRemoveAssignee });
@@ -445,7 +445,7 @@ exports.action = async function action() {
         );
         break;
       }
-      if (["closed"].includes(triggerEvent.type)) {
+      if (["closed"].includes(triggerEvent?.type)) {
         console.log(
           `Pull request triggered by an event we chose to ignore: ${triggerEvent.type}`
         );
