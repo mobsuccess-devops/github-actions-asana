@@ -122,6 +122,10 @@ exports.getActionParameters = function getActionParameters() {
   const repository = github.context.payload.repository;
   const pullRequest = github.context.payload.pull_request;
   const mergeGroup = github.context.payload.merge_group;
+  const triggerEvent = {
+    name: github.context.eventName,
+    type: github.context.action,
+  };
   const action = core.getInput("action", { required: true });
   const triggerPhrase = core.getInput("trigger-phrase") || "";
   const amplifyUri = core.getInput("amplify-uri") || "";
@@ -134,6 +138,7 @@ exports.getActionParameters = function getActionParameters() {
     amplifyUri,
     storybookAmplifyUri,
     mergeGroup,
+    triggerEvent,
   };
 };
 
@@ -349,9 +354,11 @@ exports.action = async function action() {
     triggerPhrase,
     amplifyUri,
     storybookAmplifyUri,
+    triggerEvent,
   } = exports.getActionParameters();
 
   console.log("GitHub Context", github.context.payload);
+  console.log("GitHub Trigger event", triggerEvent);
 
   if (mergeGroup) {
     console.log("Running on a merge group - skipping Asana integration");

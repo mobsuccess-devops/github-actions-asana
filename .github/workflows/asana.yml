@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - uses: mobsuccess-devops/github-actions-asana@master
+      - uses: mobsuccess-devops/github-actions-asana@fix/fix-triggers
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           github-token: ${{ github.token }}
