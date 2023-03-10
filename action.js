@@ -124,7 +124,7 @@ exports.getActionParameters = function getActionParameters() {
   const mergeGroup = github.context.payload.merge_group;
   const triggerEvent = {
     name: github.context.eventName,
-    type: github.context.action,
+    type: github.context.payload.action,
   };
   const action = core.getInput("action", { required: true });
   const triggerPhrase = core.getInput("trigger-phrase") || "";

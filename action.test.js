@@ -239,9 +239,14 @@ describe("Asana GitHub actions", () => {
     expect(action.getActionParameters()).toEqual({
       pullRequest: { number: 1234 },
       amplifyUri: "",
+      mergeGroup: undefined,
       storybookAmplifyUri: "",
       action: "test-action",
       triggerPhrase: "test-trigger-phrase",
+      triggerEvent: {
+        name: undefined,
+        type: undefined,
+      },
     });
     core.getInput.mockImplementation(
       (what) => ({ action: "test-action" }[what])
@@ -249,9 +254,14 @@ describe("Asana GitHub actions", () => {
     expect(action.getActionParameters()).toEqual({
       pullRequest: { number: 1234 },
       amplifyUri: "",
+      mergeGroup: undefined,
       storybookAmplifyUri: "",
       action: "test-action",
       triggerPhrase: "",
+      triggerEvent: {
+        name: undefined,
+        type: undefined,
+      },
     });
   });
 
