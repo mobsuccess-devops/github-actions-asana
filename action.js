@@ -385,11 +385,11 @@ exports.action = async function action() {
         JSON.stringify(github.context.payload, undefined, 4)
       );
       break;
+    case "move-ms-tester-from-reviewer-to-assignee": {
+      await moveMSTestersFromReviewerToAssignee({ pullRequest });
+      break;
+    }
     case "synchronize": {
-      if (triggerEvent?.type === "review_requested") {
-        await moveMSTestersFromReviewerToAssignee({ pullRequest });
-      }
-
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
         break;

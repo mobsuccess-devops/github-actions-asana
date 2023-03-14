@@ -25,9 +25,22 @@ on:
       - dismissed
 
 jobs:
+  Asana Move MS tester from reviewer to assignee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    if: ${{ github.event.action == 'ready_for_review' || github.event.action == 'review_requested' }}
+    steps:
+      - uses: mobsuccess-devops/github-actions-asana@master
+        with:
+          action: "move-ms-tester-from-reviewer-to-assignee"
+          asana-pat: ${{ secrets.ASANA_PAT }}
+          github-token: ${{ github.token }}
+          amplify-uri: ${{ secrets.AWS_AMPLIFY_URI }}
+          storybook-amplify-uri: ${{ secrets.AWS_STORYBOOK_AMPLIFY_URI }}
   Asana:
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    if: ${{ github.event.action != 'ready_for_review' && github.event.action != 'review_requested' }}
     steps:
       - uses: mobsuccess-devops/github-actions-asana@master
         with:
