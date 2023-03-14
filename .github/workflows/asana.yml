@@ -33,7 +33,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
+      - uses: mobsuccess-devops/github-actions-asana@master
+        if: ${{ github.event.action == 'ready_for_review' || github.event.action == 'review_requested' }}
+        with:
+          action: "move-ms-tester-from-reviewer-to-assignee"
+          asana-pat: ${{ secrets.ASANA_PAT }}
+          github-token: ${{ github.token }}
+          amplify-uri: ${{ secrets.AWS_AMPLIFY_URI }}
+          storybook-amplify-uri: ${{ secrets.AWS_STORYBOOK_AMPLIFY_URI }}
       - uses: mobsuccess-devops/github-actions-asana@fix/fix-triggers
+        if: ${{ github.event.action != 'ready_for_review' && github.event.action != 'review_requested' }}
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           github-token: ${{ github.token }}
