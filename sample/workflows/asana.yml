@@ -24,6 +24,10 @@ on:
       - edited
       - dismissed
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   Asana:
     runs-on: ubuntu-latest
