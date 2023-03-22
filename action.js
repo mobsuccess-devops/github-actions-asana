@@ -138,8 +138,8 @@ exports.getActionParameters = function getActionParameters() {
 };
 
 async function getTaskDestination({ taskId, pullRequest }) {
-  const { draft, merged_at: mergedAt } = pullRequest;
-  if (draft || !!mergedAt) {
+  const { merged_at: mergedAt } = pullRequest;
+  if (mergedAt) {
     // do not move pulls in draft or already merged
     return;
   }
