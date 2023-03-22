@@ -208,6 +208,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
     return {
       destination: asanaSprintSectionIds.toTest,
       shouldRemoveAssignee: true,
+      shouldAssignToAsanaCreator: true,
     };
   } else {
     // user ms-testers is not currently assigned
@@ -401,11 +402,25 @@ exports.action = async function action() {
           },
         };
 
-        const { destination, shouldRemoveAssignee } =
-          (await getTaskDestination({ taskId, pullRequest })) || {};
-        console.log("Got destination", { destination, shouldRemoveAssignee });
+        const {
+          destination,
+          shouldRemoveAssignee,
+          shouldAssignToAsanaCreator = false,
+        } = (await getTaskDestination({ taskId, pullRequest })) || {};
+        console.log("Got destination", {
+          destination,
+          shouldRemoveAssignee,
+          shouldAssignToAsanaCreator,
+        });
+
         if (shouldRemoveAssignee) {
           updateOptions["assignee"] = null;
+        } else if (shouldAssignToAsanaCreator) {
+          const taskForCreator = await getTask(taskId, {
+            opt_fields: ["created_by.gid"],
+          });
+          console.log("taskForCreator", taskForCreator);
+          updateOptions["assignee"] = taskForCreator.created_by.gid;
         }
         if (destination) {
           console.log(`Moving Asana task to section ${destination}`);
