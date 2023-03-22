@@ -416,6 +416,7 @@ exports.action = async function action() {
         if (shouldAssignToAsanaCreator) {
           const taskForCreator = await getTask(taskId, {
             optFields: ["created_by"],
+            opt_fields: "created_by",
           });
           console.log("taskForCreator", taskForCreator);
           updateOptions["assignee"] = taskForCreator.created_by.gid;
