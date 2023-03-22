@@ -413,14 +413,14 @@ exports.action = async function action() {
           shouldAssignToAsanaCreator,
         });
 
-        if (shouldRemoveAssignee) {
-          updateOptions["assignee"] = null;
-        } else if (shouldAssignToAsanaCreator) {
+        if (shouldAssignToAsanaCreator) {
           const taskForCreator = await getTask(taskId, {
             opt_fields: ["created_by.gid"],
           });
           console.log("taskForCreator", taskForCreator);
           updateOptions["assignee"] = taskForCreator.created_by.gid;
+        } else if (shouldRemoveAssignee) {
+          updateOptions["assignee"] = null;
         }
         if (destination) {
           console.log(`Moving Asana task to section ${destination}`);
