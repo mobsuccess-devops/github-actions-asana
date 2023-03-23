@@ -138,8 +138,8 @@ exports.getActionParameters = function getActionParameters() {
 };
 
 async function getTaskDestination({ taskId, pullRequest }) {
-  const { draft, merged_at: mergedAt } = pullRequest;
-  if (draft || !!mergedAt) {
+  const { merged_at: mergedAt } = pullRequest;
+  if (mergedAt) {
     // do not move pulls in draft or already merged
     return;
   }
@@ -208,6 +208,7 @@ async function getTaskDestination({ taskId, pullRequest }) {
     return {
       destination: asanaSprintSectionIds.toTest,
       shouldRemoveAssignee: true,
+      shouldAssignToAsanaCreator: true,
     };
   } else {
     // user ms-testers is not currently assigned
@@ -401,10 +402,23 @@ exports.action = async function action() {
           },
         };
 
-        const { destination, shouldRemoveAssignee } =
-          (await getTaskDestination({ taskId, pullRequest })) || {};
-        console.log("Got destination", { destination, shouldRemoveAssignee });
-        if (shouldRemoveAssignee) {
+        const {
+          destination,
+          shouldRemoveAssignee,
+          shouldAssignToAsanaCreator = false,
+        } = (await getTaskDestination({ taskId, pullRequest })) || {};
+        console.log("Got destination", {
+          destination,
+          shouldRemoveAssignee,
+          shouldAssignToAsanaCreator,
+        });
+
+        if (shouldAssignToAsanaCreator) {
+          const taskForCreator = await getTask(taskId, {
+            opt_fields: "created_by",
+          });
+          updateOptions["assignee"] = taskForCreator.created_by.gid;
+        } else if (shouldRemoveAssignee) {
           updateOptions["assignee"] = null;
         }
         if (destination) {
