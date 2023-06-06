@@ -6,7 +6,7 @@ async function run() {
     await action.action();
   } catch (error) {
     console.error(error);
-    core.setFailed(error.message);
+    core.setFailed(error);
   }
 }
 
