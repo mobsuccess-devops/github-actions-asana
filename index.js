@@ -14,7 +14,10 @@ async function run() {
         }/settings/actions`
       );
     }
-    core.setFailed(error.message);
+    core.setFailed(
+      error.message +
+        " (please check the logs for the full error and stack trace)"
+    );
   }
 }
 
