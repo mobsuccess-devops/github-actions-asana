@@ -359,7 +359,9 @@ exports.action = async function action() {
     return;
   }
 
+  console.log("Running on a single PR - running Asana integration");
   const taskId = exports.findAsanaTaskId({ triggerPhrase, pullRequest });
+  console.log("taskId", taskId);
 
   const asanaPRStatus = await exports.getAsanaPRStatus({
     pullRequest,
