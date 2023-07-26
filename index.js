@@ -6,6 +6,8 @@ async function run() {
     await action.action();
   } catch (error) {
     console.error(error);
+    console.error("full error object = " + JSON.stringify(error));
+
     if (error.message.includes("Resource not accessible by integration")) {
       console.info(
         `⚠️💡👉 This error might be due to the Github repository settings: make sure that the checkbox "Read and write permissions" is checked here under "Workflows": 
