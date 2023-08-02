@@ -347,7 +347,6 @@ function getAwsAmplifyLiveUrls({ id, labels, amplifyUri }) {
   const result = [];
   if (amplifyUri.match(/^{/)) {
     const amplifyUris = JSON.parse(amplifyUri);
-    // amplifyUris is now an object mapping potential labels to URIs
     for (const label of labels) {
       if (amplifyUris[label]) {
         result.push(amplifyUris[label].replace("%", id));
