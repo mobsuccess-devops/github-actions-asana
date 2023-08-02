@@ -340,6 +340,25 @@ async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
   return false;
 }
 
+function getAwsAmplifyLiveUrls({ id, labels, amplifyUri }) {
+  if (!amplifyUri) {
+    return [];
+  }
+  const result = [];
+  if (amplifyUri.match(/^{/)) {
+    const amplifyUris = JSON.parse(amplifyUri);
+    // amplifyUris is now an object mapping potential labels to URIs
+    for (const label of labels) {
+      if (amplifyUris[label]) {
+        result.push(amplifyUris[label].replace("%", id));
+      }
+    }
+  } else {
+    result.push(amplifyUri.replace("%", id));
+  }
+  return result;
+}
+
 exports.action = async function action() {
   // check if we run on a merge_group
   const {
@@ -366,6 +385,7 @@ exports.action = async function action() {
   });
   //console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
+  const labels = pullRequest.labels.map(({ name }) => name);
 
   console.info(`Calling action ${action}`);
   switch (action) {
@@ -379,14 +399,16 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
+        const amplifyLiveUrls = getAwsAmplifyLiveUrls({
+          id: pullRequest.html_url.split("/"),
+          labels,
+          amplifyUri,
+        });
         const updateOptions = {
           custom_fields: {
-            ...(amplifyUri
+            ...(amplifyLiveUrls.length
               ? {
-                  [customFieldLive.gid]: amplifyUri.replace(
-                    "%",
-                    pullRequest.html_url.split("/").pop()
-                  ),
+                  [customFieldLive.gid]: amplifyLiveUrls.join(" "),
                 }
               : {}),
             ...(storybookAmplifyUri
