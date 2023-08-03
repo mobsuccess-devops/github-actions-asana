@@ -362,7 +362,10 @@ exports.action = async function action() {
   try {
     return await actionImpl();
   } catch (error) {
+    console.log("Caught error in action");
     console.error(error);
+    console.error(error.value);
+    console.error(JSON.stringify(error.value));
     core.setFailed(error.message);
     throw error;
   }
