@@ -359,6 +359,15 @@ function getAwsAmplifyLiveUrls({ id, labels, amplifyUri }) {
 }
 
 exports.action = async function action() {
+  try {
+    return await actionImpl();
+  } catch (error) {
+    console.error(error);
+    core.setFailed(error.message);
+  }
+};
+
+async function actionImpl() {
   // check if we run on a merge_group
   const {
     mergeGroup,
@@ -480,4 +489,5 @@ exports.action = async function action() {
       break;
     }
   }
-};
+}
+
