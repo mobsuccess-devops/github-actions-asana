@@ -362,7 +362,10 @@ exports.action = async function action() {
   try {
     return await actionImpl();
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Caught error while running action, is the Asana ticket in the Current Sprint board?"
+    );
+    console.error(error, JSON.stringify(error.value));
     core.setFailed(error.message);
     throw error;
   }
