@@ -34,5 +34,5 @@ jobs:
           asana-pat: ${{ secrets.ASANA_PAT }}
           github-token: ${{ github.token }}
           action: "synchronize"
-          amplify-uri: ${{ secrets.AWS_AMPLIFY_URI }}
-          storybook-amplify-uri: ${{ secrets.AWS_STORYBOOK_AMPLIFY_URI }}
+          amplify-uri: ${{ secrets.AWS_AMPLIFY_URI }}${{ vars.AWS_AMPLIFY_URI }}
+          storybook-amplify-uri: ${{ secrets.AWS_STORYBOOK_AMPLIFY_URI }}${{ vars.AWS_STORYBOOK_AMPLIFY_URI }}
