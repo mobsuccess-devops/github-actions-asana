@@ -422,7 +422,7 @@ async function actionImpl() {
           custom_fields: {
             ...(amplifyLiveUrls.length
               ? {
-                  [customFieldLive.gid]: amplifyLiveUrls.join(" "),
+                  [customFieldLive.gid]: amplifyLiveUrls.join("\n"),
                 }
               : {}),
             ...(storybookAmplifyUri
