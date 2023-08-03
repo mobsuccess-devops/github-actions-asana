@@ -359,6 +359,16 @@ function getAwsAmplifyLiveUrls({ id, labels, amplifyUri }) {
 }
 
 exports.action = async function action() {
+  try {
+    return await actionImpl();
+  } catch (error) {
+    console.error(error);
+    core.setFailed(error.message);
+    throw error;
+  }
+};
+
+async function actionImpl() {
   // check if we run on a merge_group
   const {
     mergeGroup,
@@ -384,7 +394,7 @@ exports.action = async function action() {
   });
   //console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
-  const labels = pullRequest.labels.map(({ name }) => name);
+  const labels = (pullRequest.labels || []).map(({ name }) => name);
 
   console.info(`Calling action ${action}`);
   switch (action) {
@@ -398,8 +408,10 @@ exports.action = async function action() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
+        const pullRequestNumber =
+          pullRequest.number || pullRequest.html_url.split("/").pop();
         const amplifyLiveUrls = getAwsAmplifyLiveUrls({
-          id: pullRequest.html_url.split("/"),
+          id: pullRequestNumber,
           labels,
           amplifyUri,
         });
@@ -414,7 +426,7 @@ exports.action = async function action() {
               ? {
                   [customFieldStorybook.gid]: storybookAmplifyUri.replace(
                     "%",
-                    pullRequest.html_url.split("/").pop()
+                    pullRequestNumber
                   ),
                 }
               : {}),
@@ -480,4 +492,4 @@ exports.action = async function action() {
       break;
     }
   }
-};
+}
