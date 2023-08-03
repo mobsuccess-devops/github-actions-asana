@@ -364,6 +364,7 @@ exports.action = async function action() {
   } catch (error) {
     console.error(error);
     core.setFailed(error.message);
+    throw error;
   }
 };
 
@@ -393,7 +394,7 @@ async function actionImpl() {
   });
   //console.log("pull", pullRequest);
   console.log("asanaPRStatus", asanaPRStatus);
-  const labels = pullRequest.labels.map(({ name }) => name);
+  const labels = (pullRequest.labels || []).map(({ name }) => name);
 
   console.info(`Calling action ${action}`);
   switch (action) {
@@ -407,8 +408,10 @@ async function actionImpl() {
       if (!taskId) {
         console.log("Cannot update Asana task: no taskId was found");
       } else {
+        const pullRequestNumber =
+          pullRequest.number || pullRequest.html_url.split("/").pop();
         const amplifyLiveUrls = getAwsAmplifyLiveUrls({
-          id: pullRequest.html_url.split("/"),
+          id: pullRequestNumber,
           labels,
           amplifyUri,
         });
@@ -423,7 +426,7 @@ async function actionImpl() {
               ? {
                   [customFieldStorybook.gid]: storybookAmplifyUri.replace(
                     "%",
-                    pullRequest.html_url.split("/").pop()
+                    pullRequestNumber
                   ),
                 }
               : {}),
