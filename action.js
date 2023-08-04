@@ -317,29 +317,6 @@ async function moveTaskToSprintAndEpicSection({ taskId, sectionId }) {
   }
 }
 
-async function checkIfCanMergeWithoutAsanaTask({ repository, pullRequest }) {
-  const { assignees } = pullRequest;
-  const assigneeLogins = assignees.map(({ login }) => login);
-  if (!assigneeLogins.some((login) => login === "ms-testers")) {
-    return false;
-  }
-
-  // if mobsuccess.yml has the `accept_ms_testers_without_closed_task` flag set to true, we can merge
-  const mobsuccessyml = await getMobsuccessYMLFromRepo({
-    owner: repository.owner.login,
-    repo: repository.name,
-    branch: pullRequest.head ? pullRequest.head.ref : "master",
-  });
-  const asanaSettings = mobsuccessyml.asana || {};
-  if (asanaSettings.accept_ms_testers_without_closed_task) {
-    console.log(
-      "accept_ms_testers_without_closed_task is set to true, ok to merge"
-    );
-    return true;
-  }
-  return false;
-}
-
 function getAwsAmplifyLiveUrls({ id, labels, amplifyUri }) {
   if (!amplifyUri) {
     return [];
@@ -375,7 +352,6 @@ async function actionImpl() {
   // check if we run on a merge_group
   const {
     mergeGroup,
-    repository,
     pullRequest,
     action,
     triggerPhrase,
@@ -480,15 +456,7 @@ async function actionImpl() {
           });
           console.log("Task is completed?", completed);
           if (!completed) {
-            // check if can merge without a completed asana task
-            const canMergeWithoutAsanaTask = await checkIfCanMergeWithoutAsanaTask(
-              { repository, pullRequest }
-            );
-            if (!canMergeWithoutAsanaTask) {
-              throw new Error(
-                "Asana task is not yet completed, blocking merge"
-              );
-            }
+            throw new Error("Asana task is not yet completed, blocking merge");
           }
         }
       }
