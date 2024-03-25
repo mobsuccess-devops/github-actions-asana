@@ -21,7 +21,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^4.0.0",
+    "@actions/github": "^6.0.0",
     "@mobsuccess-devops/asana-magics": "^1.0.1-ci-4263876762.0",
     "asana": "^0.18.5"
   },
